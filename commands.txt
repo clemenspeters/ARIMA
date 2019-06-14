@@ -1,0 +1,12 @@
+python -m pip3 install --user numpy scipy matplotlib ipython jupyter pandas sympy nose
+
+pip install numpy scipy matplotlib ipython jupyter pandas sympy nose\
+pip install statsmodels
+
+
+
+docker pull fastgenomics/pandas:0.22-p36-v3
+docker run -it -d fastgenomics/pandas:0.22-p36-v3
+docker ps -a
+docker ps -l
+docker events&
