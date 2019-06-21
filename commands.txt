@@ -1,7 +1,5 @@
-python -m pip3 install --user numpy scipy matplotlib ipython jupyter pandas sympy nose
-
-pip install numpy scipy matplotlib ipython jupyter pandas sympy nose\
-pip install statsmodels
+brew install python3
+pip3 install numpy scipy matplotlib ipython jupyter pandas sympy nose statsmodels
 
 
 
