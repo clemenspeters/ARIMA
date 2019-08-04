@@ -1,4 +1,8 @@
+from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
 import statsmodels.api as sm
+plt.style.use('ggplot')
+
 
 class AnomalyDetector:
     def __init__(self):
@@ -34,3 +38,14 @@ class AnomalyDetector:
     def printFeatures(self):
         for feature in self.features:
             print(feature)
+
+    def visualizeFeatures(self, method='TSNE'):
+        if (method == 'TSNE'):
+            embedded = TSNE(n_components=2).fit_transform(self.features)
+            fig = plt.figure(1, figsize=(12, 3))
+            sub1 = fig.add_subplot(111)
+            sub1.scatter(embedded[:, 0], embedded[:, 1])
+            fig.savefig('TSNE-features.png')
+            # Show the plot in non-blocking mode
+            plt.show()
+

@@ -1,7 +1,6 @@
 # Source: https://www.statsmodels.org/stable/_modules/statsmodels/tsa/arima_process.html#arma_generate_sample
 from scipy import signal
 import numpy as np
-# import matplotlib.style
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 np.random.seed(12345)
@@ -22,7 +21,7 @@ class DataGenerator:
 
         self.sigma = 1                   # standard deviation of noise
         self.distrvs = np.random.randn   # function that generates the random numbers, and takes sample size as argument
-        self.nsample = 200               # number of observations/samples
+        self.nsample = 500               # number of observations/samples
         self.burnin = 0                  # Burn in observations at the generated and dropped from the beginning of the sample
         self.eta = self.sigma * self.distrvs(self.nsample + self.burnin) # this is where the random samples are drawn. (((Maybe we can insert our anomalies here?)))
         self.y = []
@@ -37,9 +36,11 @@ class DataGenerator:
         ))
         return self.y
     
-    def show(self):
+    def visualize(self):
         fig = plt.figure(1, figsize=(12, 3))
         ax4 = fig.add_subplot(111)
         ax4.title.set_text("Generated training data. Four windows stitched together. Window size = 50")
         ax4.plot(np.arange(self.nsample), self.y[self.burnin:])
         plt.tight_layout() # avoid overlapping plot titles
+        fig.savefig('data.png')
+        plt.show()
