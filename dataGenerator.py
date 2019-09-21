@@ -56,6 +56,7 @@ class DataGenerator:
         if plot_data:
             self.visualize(stitched_data)
 
+        self.save_data(stitched_data)
         return stitched_data
 
     def arma_generate_sample(self, ar, ma):
@@ -72,6 +73,16 @@ class DataGenerator:
         eta = sigma * distrvs(self.nsample)     # this is where the random samples are drawn. (((Maybe we can insert our anomalies here?)))
         return signal.lfilter(maparams, arparams, eta, axis=0)
     
+    def save_data(self, data):
+        """Write data to generated_data.npy file.
+        """
+        np.save('generated_data', data)
+
+    def load_data(self):
+        """Load data from generated_data.npy file.
+        """
+        return np.load('generated_data.npy')
+
     def visualize(self, data):
         """Plot the generated (stitched) data containing the anomalies.
         """
