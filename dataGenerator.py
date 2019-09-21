@@ -6,37 +6,56 @@ plt.style.use('ggplot')
 np.random.seed(12345)
 
 class DataGenerator:
-    def __init__(self, windowCount, windowSize, anomaly):
-        self.anomaly = anomaly                  # given windows which should be anomalies
-        self.windowSize = windowSize            # number of observations/samples per window
-        self.windowCount = windowCount    
-        self.sigma = 1                              # standard deviation of noise
-        self.distrvs = np.random.randn              # function that generates the random numbers, and takes sample size as argument
-        self.nsample = windowCount * windowSize     # number of observations/samples
-        self.burnin = 0                             # Burn in observations at the generated and dropped from the beginning of the sample
-        self.eta = self.sigma * self.distrvs(self.nsample + self.burnin) # this is where the random samples are drawn. (((Maybe we can insert our anomalies here?)))
-        self.defaultSeries = []
-        self.anomalySeries = []
-        self.stitchedData = []
+    """
+    Generates a time series which consits of number of windows.
+    Some of these windows contain anomalies.
 
-    def generate_data(self):
+    Parameters
+    ----------
+    window_count (int)
+        Number of windows in generated series.\n
+    window_size : int
+        Number of observations/samples per window.\n
+    anomalies : array
+        Indices of the windows containing anomalies.\n
+    """
+    def __init__(self, window_count, window_size, anomalies):
+        self.anomalies = anomalies
+        self.window_size = window_size
+        self.window_count = window_count
+        self.nsample = window_count * window_size  # number of observations/samples
+
+    def generate_data(self, plot_data=True):
         """Stitch together two time series with different  ARMA parameters
         to generate one timeseries which contains anomalies.
+
+        Parameters
+        ----------
+        plot_data : bool
+            Show generated data as plots.
+        
+        Returns
+        -------
+        stitched_ata: array
+            Data containing anomalies.
         """
         # # Genrate the two timeseries (with different ARMA parameters)
-        self.defaultSeries = self.arma_generate_sample([.75, -.25], [.65, .35])
-        self.anomalySeries = self.arma_generate_sample([.75, -.25], [-.65, .35])
+        default_series = self.arma_generate_sample([.75, -.25], [.65, .35])
+        anomaly_series = self.arma_generate_sample([.75, -.25], [-.65, .35])
         # Plot the two timeseries
-        self.show_raw_data()
+        if plot_data:
+            self.show_raw_data(default_series, anomaly_series)
         # Combine the two timeseries to get one time series containing anomalies
-        anomalyStart = self.anomaly[0]
-        anomalyEnd = self.anomaly[1]
-        self.stitchedData = np.hstack((
-            self.defaultSeries[self.burnin + 0 : anomalyStart + self.burnin],
-            self.anomalySeries[self.burnin + anomalyStart : anomalyEnd + self.burnin],
-            self.defaultSeries[self.burnin + anomalyEnd :],
-        ))
-        return self.stitchedData
+        stitched_ata = default_series
+        for anomaly in self.anomalies:
+            start = anomaly * self.window_size
+            end = (anomaly + 1) * self.window_size
+            # Inject anomalies
+            stitched_ata[start : end] =  anomaly_series[start : end]
+
+        if plot_data:
+            self.visualize(stitched_ata)
+        return stitched_ata
 
     def arma_generate_sample(self, ar, ma):
         """
@@ -46,29 +65,40 @@ class DataGenerator:
         maparams = np.array(ma)
         arparams = np.r_[1, -arparams] # add zero-lag and negate
         maparams = np.r_[1, maparams]  # add zero-lag
-        return signal.lfilter(maparams, arparams, self.eta, axis=0)
+        # Generate samples
+        sigma = 1                               # standard deviation of noise
+        distrvs = np.random.randn               # function that generates the random numbers, and takes sample size as argument
+        eta = sigma * distrvs(self.nsample)     # this is where the random samples are drawn. (((Maybe we can insert our anomalies here?)))
+        return signal.lfilter(maparams, arparams, eta, axis=0)
     
-    def visualize(self):
+    def visualize(self, data):
         """Plot the generated (stitched) data containing the anomalies.
         """
         fig = plt.figure(1, figsize=(12, 3))
         ax1 = fig.add_subplot(111)
         # Generate title to show window count and anomaly window
-        anomalyStart = self.anomaly[0]
-        anomalyEnd = self.anomaly[1]
-        ax1.title.set_text('Generated training data. {} windows stitched together. Window size = {}. Anomaly: ({}:{})'.format(
-            int(self.nsample / self.windowSize), 
-            self.windowSize,
-            anomalyStart,
-            anomalyEnd
-        ))
-        ax1.plot(np.arange(self.nsample), self.stitchedData[self.burnin:])
+        ax1.title.set_text(self.get_title())
+        ax1.plot(np.arange(self.nsample), data)
         plt.tight_layout() # avoid overlapping plot titles
         fig.savefig('data.png')
         plt.show()
 
+    def get_title(self):
+        """
+        Generate title for the data plot containing all anomalies.
+        """
+        title = 'Generated training data. {} windows stitched together. Window size = {}.'.format(
+            self.window_count, 
+            self.window_size,
+        )
+        anomaliesStr = ' Anomalies:'
+        for anomaly in self.anomalies:
+            start = anomaly * self.window_size
+            end = (anomaly + 1) * self.window_size
+            anomaliesStr +=  ' ({}:{})'.format(start, end)
+        return title + anomaliesStr
 
-    def show_raw_data(self):
+    def show_raw_data(self, default_series, anomaly_series):
         """Plot the two time series which will be stitched together.
         """
         fig = plt.figure(1, figsize=(12, 3))
@@ -76,8 +106,8 @@ class DataGenerator:
         ax2 = fig.add_subplot(212)
         ax1.title.set_text('Normal time series.')
         ax2.title.set_text('Anomaly time series.')
-        ax1.plot(np.arange(self.nsample), self.defaultSeries)
-        ax2.plot(np.arange(self.nsample), self.anomalySeries)
+        ax1.plot(np.arange(self.nsample), default_series)
+        ax2.plot(np.arange(self.nsample), anomaly_series)
         plt.tight_layout() # avoid overlapping plot titles
         fig.savefig('raw_data.png')
         plt.show()
