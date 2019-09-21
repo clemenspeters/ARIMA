@@ -36,7 +36,7 @@ class DataGenerator:
         
         Returns
         -------
-        stitched_ata: array
+        stitched_data: array
             Data containing anomalies.
         """
         # # Genrate the two timeseries (with different ARMA parameters)
@@ -46,16 +46,17 @@ class DataGenerator:
         if plot_data:
             self.show_raw_data(default_series, anomaly_series)
         # Combine the two timeseries to get one time series containing anomalies
-        stitched_ata = default_series
+        stitched_data = default_series
         for anomaly in self.anomalies:
             start = anomaly * self.window_size
             end = (anomaly + 1) * self.window_size
             # Inject anomalies
-            stitched_ata[start : end] =  anomaly_series[start : end]
+            stitched_data[start : end] =  anomaly_series[start : end]
 
         if plot_data:
-            self.visualize(stitched_ata)
-        return stitched_ata
+            self.visualize(stitched_data)
+
+        return stitched_data
 
     def arma_generate_sample(self, ar, ma):
         """
