@@ -17,6 +17,7 @@ class AnomalyDetector:
         windows = self.get_windows(data)
         self.features = self.get_parameters(windows, self.get_arma_params)
         self.save_data(self.features)
+        return self.features
 
     def get_windows(self, data):
         result = []
@@ -57,20 +58,31 @@ class AnomalyDetector:
         for feature in self.features:
             print(feature)
 
-    def visualize_features(self, method='TSNE'):
+    def visualize_features(self, features, method='TSNE'):
         if (method == 'TSNE'):
-            embedded = TSNE(n_components=2).fit_transform(self.features)
+            embedded = TSNE(n_components=2).fit_transform(features)
             fig = plt.figure(1, figsize=(12, 3))
             sub1 = fig.add_subplot(111)
             sub1.scatter(embedded[:, 0], embedded[:, 1])
              # Add labels and color to anomaly datapoints
+            if (len(self.window_labels) < 1):
+                start = 0
+                end = self.window_size
+                for i, feature in enumerate(features):
+                    self.window_labels.append([start, end])
+                    start = int( start + self.stride)
+                    end = int( end + self.stride)
+            anomaliesStr = ' Anomalies:'
             for anomaly in self.anomalies:
                 start = anomaly * self.window_size
                 end = (anomaly + 1) * self.window_size
                 for i, txt in enumerate(self.window_labels):
                     if (txt == [start, end]):
                         sub1.scatter(embedded[i, 0], embedded[i, 1], c='green')
+                        anomaliesStr +=  '(x={}, y={})\n'.format(embedded[i, 0], embedded[i, 1])
                         sub1.annotate('Anomaly: {}'.format(txt), (embedded[i, 0], embedded[i, 1]))
+            sub1.title.set_text('TSNE embedded features\n. {}'.format(anomaliesStr))
+            fig.tight_layout()
             fig.savefig('TSNE-features.png')
             # Show the plot in non-blocking mode
             plt.show()
