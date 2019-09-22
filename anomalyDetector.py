@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 
+from sklearn.covariance import EllipticEnvelope
 from sklearn import svm
 from sklearn.ensemble import IsolationForest
 from sklearn.neighbors import LocalOutlierFactor
@@ -10,6 +11,7 @@ from sklearn.neighbors import LocalOutlierFactor
 outliers_fraction = 0.002
 # define outlier/anomaly detection methods to be compared
 anomaly_algorithms = [
+    ("Robust covariance", EllipticEnvelope(contamination=outliers_fraction)),
     (
         "One-Class SVM", 
         svm.OneClassSVM(
