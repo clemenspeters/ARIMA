@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+plt.style.use('ggplot')
 
 from sklearn.covariance import EllipticEnvelope
 from sklearn import svm
@@ -8,7 +9,7 @@ from sklearn.ensemble import IsolationForest
 from sklearn.neighbors import LocalOutlierFactor
 
 
-outliers_fraction = 0.002
+outliers_fraction = 0.001
 # define outlier/anomaly detection methods to be compared
 anomaly_algorithms = [
     ("Robust covariance", EllipticEnvelope(contamination=outliers_fraction)),
@@ -68,13 +69,6 @@ class AnomalyDetector:
         dim1 = 1  # first dimension to plot (of the features)
         dim2 = 2  # second dimension to plot (of the features)
         plt.scatter(X[:, dim1], X[:, dim2], s=10, color=colors[(y_pred + 1) // 2])
-        # plt.xlim(-7, 7)
-        # plt.ylim(-7, 7)
-        plt.xticks(())
-        plt.yticks(())
-        plt.text(.99, .01, name,
-            transform=plt.gca().transAxes, size=15,
-            horizontalalignment='right')
         for i, pred in enumerate(y_pred):
             if (pred < 0):
                 plt.annotate('Index: {}'.format(i), (X[i, dim1], X[i, dim2]))
