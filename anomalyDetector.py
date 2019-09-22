@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 
+from sklearn import svm
 from sklearn.ensemble import IsolationForest
 from sklearn.neighbors import LocalOutlierFactor
 
@@ -9,6 +10,14 @@ from sklearn.neighbors import LocalOutlierFactor
 outliers_fraction = 0.002
 # define outlier/anomaly detection methods to be compared
 anomaly_algorithms = [
+    (
+        "One-Class SVM", 
+        svm.OneClassSVM(
+            nu=outliers_fraction, 
+            kernel="rbf",
+            gamma=0.1
+        )
+    ),
     (
         "Isolation Forest",
         IsolationForest(
