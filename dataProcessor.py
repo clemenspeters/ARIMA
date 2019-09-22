@@ -75,12 +75,12 @@ class DataProcessor:
     def save_data(self, data):
         """Write data to features.npy file.
         """
-        np.save('features', data)
+        np.save('data/features', data)
 
     def load_data(self):
         """Load data from features.npy file.
         """
-        return np.load('features.npy')
+        return np.load('data/features.npy')
 
     def print_features(self):
         for feature in self.features:
@@ -112,7 +112,7 @@ class DataProcessor:
                         sub1.annotate('Anomaly: {}'.format(txt), (embedded[i, 0], embedded[i, 1]))
             sub1.title.set_text('TSNE embedded features\n. {}'.format(anomaliesStr))
             fig.tight_layout()
-            fig.savefig('TSNE-features.png')
+            fig.savefig('img/TSNE-features.png')
             # Show the plot in non-blocking mode
             plt.show()
 

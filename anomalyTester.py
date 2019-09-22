@@ -5,7 +5,7 @@ import anomalyDetector
 
 def load_data(filename):
     """Load data from file."""
-    return np.load(filename)
+    return np.load('data/{}'.format(filename))
 
 
 window_size = 100

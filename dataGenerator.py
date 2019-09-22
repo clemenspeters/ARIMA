@@ -1,6 +1,8 @@
 # Source: https://www.statsmodels.org/stable/_modules/statsmodels/tsa/arima_process.html#arma_generate_sample
 from scipy import signal
 import numpy as np
+import statsmodels.tsa.arima_process as arima
+import statsmodels.tsa as sm
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 np.random.seed(12345)
@@ -40,8 +42,11 @@ class DataGenerator:
             Data containing anomalies.
         """
         # # Genrate the two timeseries (with different ARMA parameters)
-        default_series = self.arma_generate_sample([.75, -.25], [.65, .35])
-        anomaly_series = self.arma_generate_sample([.75, -.25], [-.65, .35])
+        ar, ma = self.arma_generate_params([.75, -.25], [.65, .35])
+        default_series = arima.arma_generate_sample(ar, ma, self.nsample)
+
+        ar, ma = self.arma_generate_params([.75, -.25], [-.65, .35])
+        anomaly_series = arima.arma_generate_sample(ar, ma, self.nsample)
         # Plot the two timeseries
         if plot_data:
             self.show_raw_data(default_series, anomaly_series)
@@ -72,16 +77,26 @@ class DataGenerator:
         distrvs = np.random.randn               # function that generates the random numbers, and takes sample size as argument
         eta = sigma * distrvs(self.nsample)     # this is where the random samples are drawn. (((Maybe we can insert our anomalies here?)))
         return signal.lfilter(maparams, arparams, eta, axis=0)
+
+    def arma_generate_params(self, ar, ma):
+        """
+        See: https://www.statsmodels.org/devel/_modules/statsmodels/tsa/arima_process.html#ArmaProcess.generate_sample
+        """
+        arparams = np.array(ar)
+        maparams = np.array(ma)
+        arparams = np.r_[1, -arparams] # add zero-lag and negate
+        maparams = np.r_[1, maparams]  # add zero-lag
+        return arparams, maparams
     
     def save_data(self, data):
         """Write data to generated_data.npy file.
         """
-        np.save('generated_data', data)
+        np.save('data/generated_data', data)
 
     def load_data(self):
         """Load data from generated_data.npy file.
         """
-        return np.load('generated_data.npy')
+        return np.load('data/generated_data.npy')
 
     def visualize(self, data):
         """Plot the generated (stitched) data containing the anomalies.
@@ -92,7 +107,7 @@ class DataGenerator:
         ax1.title.set_text(self.get_title())
         ax1.plot(np.arange(self.nsample), data)
         plt.tight_layout() # avoid overlapping plot titles
-        fig.savefig('data.png')
+        fig.savefig('img/data.png')
         plt.show()
 
     def get_title(self):
@@ -121,5 +136,5 @@ class DataGenerator:
         ax1.plot(np.arange(self.nsample), default_series)
         ax2.plot(np.arange(self.nsample), anomaly_series)
         plt.tight_layout() # avoid overlapping plot titles
-        fig.savefig('raw_data.png')
+        fig.savefig('img/raw_data.png')
         plt.show()
