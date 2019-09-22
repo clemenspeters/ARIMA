@@ -5,7 +5,11 @@ import statsmodels.api as sm
 plt.style.use('ggplot')
 
 
-class AnomalyDetector:
+class DataProcessor:
+    """This is where the dimensionality reduction happens.
+    The timeseries in cut into smaller windows. On each window and ARMA model 
+    is fittet. The parameters of the ARMA model serve as features.
+    """
     def __init__(self, window_size, anomalies):
         self.anomalies = anomalies
         self.window_size = window_size
@@ -13,29 +17,53 @@ class AnomalyDetector:
         self.features = []
         self.window_labels = []
 
-    def reduce_arma(self, data):
-        windows = self.get_windows(data)
+    def reduce_arma(self, timeseries):
+        """Process the complete timeseries. Create windows first and then
+        encode each window to reduce the dimensionality.
+
+        Returns
+        -------
+        features: list
+            List of features. 
+        """
+        windows = self.get_windows(timeseries)
         self.features = self.get_parameters(windows, self.get_arma_params)
         self.save_data(self.features)
         return self.features
 
-    def get_windows(self, data):
-        result = []
+    def get_windows(self, timeseries):
+        """Cuts the given timeseries in windows and creates a list of labels
+        for the crated windows (self.window_labels).
+
+        Parameters
+        ----------
+        timeseries: array-like
+            Original timeseries data which is cut into windows.
+
+        Returns
+        -------
+        windows: list
+            List of windows. 
+        """
+        windowList = []
         start = 0
         end = self.window_size
-        while (end <= data.size):
+        while (end <= timeseries.size):
             self.window_labels.append([start, end])
-            result.append(data[start: end])
+            windowList.append(timeseries[start: end])
             start = int( start + self.stride)
             end = int( end + self.stride)
-        return result
+        return windowList
 
     def get_parameters(self, windows, encoder_function):
-        parameters = []
+        """Iterates over all windows and runs the encoder_function on 
+        each window.
+        """
+        parametersList = []
         for window in windows:
             params = encoder_function(window)
-            parameters.append(params)
-        return parameters
+            parametersList.append(params)
+        return parametersList
 
     def get_arma_params(self, dataWindow):
         model = sm.tsa.ARMA(dataWindow, (2, 2))
@@ -78,6 +106,7 @@ class AnomalyDetector:
                 end = (anomaly + 1) * self.window_size
                 for i, txt in enumerate(self.window_labels):
                     if (txt == [start, end]):
+                        print(i)
                         sub1.scatter(embedded[i, 0], embedded[i, 1], c='green')
                         anomaliesStr +=  '(x={}, y={})\n'.format(embedded[i, 0], embedded[i, 1])
                         sub1.annotate('Anomaly: {}'.format(txt), (embedded[i, 0], embedded[i, 1]))
