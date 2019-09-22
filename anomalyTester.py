@@ -1,6 +1,7 @@
 import numpy as np
 import dataGenerator
 import dataProcessor
+import anomalyDetector
 
 def load_data(filename):
     """Load data from file."""
@@ -18,7 +19,10 @@ generator = dataGenerator.DataGenerator(window_count, window_size, anomalies)
 # generator.visualize(data)
 
 # Generate features
-detector = dataProcessor.DataProcessor(window_size, anomalies)
-# features = detector.reduce_arma(data)
+# processor = dataProcessor.DataProcessor(window_size, anomalies)
+# features = processor.reduce_arma(data)
 features = load_data('features.npy')
-detector.visualize_features(features)
+# processor.visualize_features(features)
+
+detector = anomalyDetector.AnomalyDetector()
+detector.detect_anomalies(features)
