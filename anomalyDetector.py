@@ -65,7 +65,9 @@ class AnomalyDetector:
     def plot_anomalies(self, name, X, y_pred, plt):
         # Create scatter plot
         colors = np.array(['#377eb8', '#ff7f00'])
-        plt.scatter(X[:, 2], X[:, 3], s=10, color=colors[(y_pred + 1) // 2])
+        dim1 = 1  # first dimension to plot (of the features)
+        dim2 = 2  # second dimension to plot (of the features)
+        plt.scatter(X[:, dim1], X[:, dim2], s=10, color=colors[(y_pred + 1) // 2])
         # plt.xlim(-7, 7)
         # plt.ylim(-7, 7)
         plt.xticks(())
@@ -75,7 +77,7 @@ class AnomalyDetector:
             horizontalalignment='right')
         for i, pred in enumerate(y_pred):
             if (pred < 0):
-                plt.annotate('Index: {}'.format(i), (X[i, 2], X[i, 3]))
+                plt.annotate('Index: {}'.format(i), (X[i, dim1], X[i, dim2]))
 
     def print_anomalies(self, name, y_pred):
         # Print to console
