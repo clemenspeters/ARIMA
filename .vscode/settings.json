@@ -2,6 +2,10 @@
     "cSpell.words": [
         "Arma",
         "TSNE",
-        "arima"
+        "arima",
+        "ggplot",
+        "numpy",
+        "pyplot",
+        "sklearn"
     ]
 }
