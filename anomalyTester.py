@@ -19,11 +19,15 @@ generator = dataGenerator.DataGenerator(window_count, window_size, anomalies)
 # generator.visualize(data)
 
 # Generate features
-# processor = dataProcessor.DataProcessor(window_size, anomalies)
+# processor = dataProcessor.DataProcessor(window_size, anomalies, 'results/features')
 # features = processor.reduce_arma(data)
 features = load_data('features.npy')
 # processor.visualize_features(features)
 
 outliers_fraction = 0.001
-detector = anomalyDetector.AnomalyDetector(outliers_fraction, window_size)
+detector = anomalyDetector.AnomalyDetector(
+    outliers_fraction, 
+    window_size, 
+    'img/anomalies'
+)
 detector.detect_anomalies(features)

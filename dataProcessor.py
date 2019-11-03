@@ -10,7 +10,7 @@ class DataProcessor:
     The timeseries in cut into smaller windows. On each window and ARMA model 
     is fittet. The parameters of the ARMA model serve as features.
     """
-    def __init__(self, window_size, anomalies, data_file = 'features'):
+    def __init__(self, window_size, anomalies, data_file):
         self.anomalies = anomalies
         self.window_size = window_size
         self.stride = self.window_size / 2
@@ -76,12 +76,12 @@ class DataProcessor:
     def save_data(self, data):
         """Write data to features.npy file.
         """
-        np.save('results/{}'.format(self.data_file), data)
+        np.save('{}'.format(self.data_file), data)
 
     def load_data(self):
         """Load data from features.npy file.
         """
-        return np.load('results/{}.npy'.format(self.data_file))
+        return np.load('{}.npy'.format(self.data_file))
 
     def print_features(self):
         for feature in self.features:
@@ -90,9 +90,8 @@ class DataProcessor:
     def visualize_features(self, features, method='TSNE'):
         if (method == 'TSNE'):
             embedded = TSNE(n_components=2).fit_transform(features)
-            fig = plt.figure(1, figsize=(12, 3))
-            sub1 = fig.add_subplot(111)
-            sub1.scatter(embedded[:, 0], embedded[:, 1])
+            fig = plt.figure()
+            plt.scatter(embedded[:, 0], embedded[:, 1])
              # Add labels and color to anomaly datapoints
             if (len(self.window_labels) < 1):
                 start = 0
@@ -108,12 +107,12 @@ class DataProcessor:
                 for i, txt in enumerate(self.window_labels):
                     if (txt == [start, end]):
                         print(i)
-                        sub1.scatter(embedded[i, 0], embedded[i, 1], c='green')
+                        plt.scatter(embedded[i, 0], embedded[i, 1], c='green')
                         anomaliesStr +=  '(x={}, y={})\n'.format(embedded[i, 0], embedded[i, 1])
-                        sub1.annotate('Anomaly: {}'.format(txt), (embedded[i, 0], embedded[i, 1]))
-            sub1.title.set_text('TSNE embedded features\n. {}'.format(anomaliesStr))
+                        plt.annotate('Anomaly: {}'.format(txt), (embedded[i, 0], embedded[i, 1]))
+            plt.title('TSNE embedded features\n. {}'.format(anomaliesStr))
             fig.tight_layout()
-            fig.savefig('img/TSNE-features.png')
+            fig.savefig('{}_TSNE-features.png'.format(self.data_file))
             # Show the plot in non-blocking mode
             plt.show()
 

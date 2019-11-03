@@ -12,10 +12,11 @@ from sklearn.neighbors import LocalOutlierFactor
 class AnomalyDetector:
 # See: https://scikit-learn.org/stable/auto_examples/plot_anomaly_comparison.html#sphx-glr-auto-examples-plot-anomaly-comparison-py
 
-    def __init__(self, outliers_fraction, window_size):
+    def __init__(self, outliers_fraction, window_size, file):
         self.outliers_fraction = outliers_fraction
         self.window_size = window_size
         self.stride = self.window_size / 2
+        self.file = file
         # define outlier/anomaly detection methods to be compared
         self.anomaly_algorithms = [
             ("Robust covariance", EllipticEnvelope(contamination=outliers_fraction)),
@@ -63,7 +64,7 @@ class AnomalyDetector:
             self.plot_anomalies(name, X, y_pred, plt)
             plot_num += 1
         plt.tight_layout()
-        plt.savefig('img/anomalies.png')
+        plt.savefig('{}.png'.format(self.file))
         plt.show()
 
     def plot_anomalies(self, name, X, y_pred, plt):
