@@ -24,5 +24,6 @@ generator = dataGenerator.DataGenerator(window_count, window_size, anomalies)
 features = load_data('features.npy')
 # processor.visualize_features(features)
 
-detector = anomalyDetector.AnomalyDetector()
+outliers_fraction = 0.001
+detector = anomalyDetector.AnomalyDetector(outliers_fraction, window_size)
 detector.detect_anomalies(features)

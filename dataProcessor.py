@@ -10,12 +10,13 @@ class DataProcessor:
     The timeseries in cut into smaller windows. On each window and ARMA model 
     is fittet. The parameters of the ARMA model serve as features.
     """
-    def __init__(self, window_size, anomalies):
+    def __init__(self, window_size, anomalies, data_file = 'features'):
         self.anomalies = anomalies
         self.window_size = window_size
         self.stride = self.window_size / 2
         self.features = []
         self.window_labels = []
+        self.data_file = data_file
 
     def reduce_arma(self, timeseries):
         """Process the complete timeseries. Create windows first and then
@@ -75,12 +76,12 @@ class DataProcessor:
     def save_data(self, data):
         """Write data to features.npy file.
         """
-        np.save('data/features', data)
+        np.save('results/{}'.format(self.data_file), data)
 
     def load_data(self):
         """Load data from features.npy file.
         """
-        return np.load('data/features.npy')
+        return np.load('results/{}.npy'.format(self.data_file))
 
     def print_features(self):
         for feature in self.features:
@@ -102,8 +103,8 @@ class DataProcessor:
                     end = int( end + self.stride)
             anomaliesStr = ' Anomalies:'
             for anomaly in self.anomalies:
-                start = anomaly * self.window_size
-                end = (anomaly + 1) * self.window_size
+                start = anomaly * self.stride
+                end = start + self.window_size
                 for i, txt in enumerate(self.window_labels):
                     if (txt == [start, end]):
                         print(i)

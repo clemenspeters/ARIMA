@@ -9,45 +9,48 @@ from sklearn.ensemble import IsolationForest
 from sklearn.neighbors import LocalOutlierFactor
 
 
-outliers_fraction = 0.001
-# define outlier/anomaly detection methods to be compared
-anomaly_algorithms = [
-    ("Robust covariance", EllipticEnvelope(contamination=outliers_fraction)),
-    (
-        "One-Class SVM", 
-        svm.OneClassSVM(
-            nu=outliers_fraction, 
-            kernel="rbf",
-            gamma=0.1
-        )
-    ),
-    (
-        "Isolation Forest",
-        IsolationForest(
-            behaviour='new',
-            contamination=outliers_fraction,
-            random_state=42
-        )
-    ),
-    (
-        "Local Outlier Factor", 
-        LocalOutlierFactor(
-            n_neighbors=35, 
-            contamination=outliers_fraction
-        )
-    )
-]
-
 class AnomalyDetector:
 # See: https://scikit-learn.org/stable/auto_examples/plot_anomaly_comparison.html#sphx-glr-auto-examples-plot-anomaly-comparison-py
 
+    def __init__(self, outliers_fraction, window_size):
+        self.outliers_fraction = outliers_fraction
+        self.window_size = window_size
+        self.stride = self.window_size / 2
+        # define outlier/anomaly detection methods to be compared
+        self.anomaly_algorithms = [
+            ("Robust covariance", EllipticEnvelope(contamination=outliers_fraction)),
+            (
+                "One-Class SVM", 
+                svm.OneClassSVM(
+                    nu=outliers_fraction, 
+                    kernel="rbf",
+                    gamma=0.1
+                )
+            ),
+            (
+                "Isolation Forest",
+                IsolationForest(
+                    behaviour='new',
+                    contamination=outliers_fraction,
+                    random_state=42
+                )
+            ),
+            (
+                "Local Outlier Factor", 
+                LocalOutlierFactor(
+                    n_neighbors=35, 
+                    contamination=outliers_fraction
+                )
+            )
+        ]
+
     def detect_anomalies(self, X):
         plot_num = 1
-        plt.figure(figsize=(len(anomaly_algorithms) * 2 + 3, 6))
+        plt.figure(figsize=(len(self.anomaly_algorithms) * 2 + 3, 6))
 
-        for name, algorithm in anomaly_algorithms:
+        for name, algorithm in self.anomaly_algorithms:
             algorithm.fit(X)
-            plt.subplot(1, len(anomaly_algorithms), plot_num)
+            plt.subplot(1, len(self.anomaly_algorithms), plot_num)
             plt.title(name, size=18)
 
             # fit the data and tag outliers
@@ -78,4 +81,9 @@ class AnomalyDetector:
         print(name)
         for i, pred in enumerate(y_pred):
             if (pred == -1):
-                print(i, pred)
+                print(
+                    i, 
+                    pred, 
+                    i * self.stride, '-', 
+                    i * self.stride + self.window_size
+                )
