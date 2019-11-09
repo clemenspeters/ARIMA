@@ -1,5 +1,6 @@
 from sklearn.manifold import TSNE
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
 plt.style.use('ggplot')
@@ -10,15 +11,14 @@ class DataProcessor:
     The timeseries in cut into smaller windows. On each window and ARMA model 
     is fittet. The parameters of the ARMA model serve as features.
     """
-    def __init__(self, window_size, anomalies, data_file):
+    def __init__(self, window_size, anomalies):
         self.anomalies = anomalies
         self.window_size = window_size
         self.stride = self.window_size / 2
         self.features = []
         self.window_labels = []
-        self.data_file = data_file
 
-    def reduce_arma(self, timeseries):
+    def reduce_arma(self, timeseries, file_name):
         """Process the complete timeseries. Create windows first and then
         encode each window to reduce the dimensionality.
 
@@ -29,7 +29,7 @@ class DataProcessor:
         """
         windows = self.get_windows(timeseries)
         self.features = self.get_parameters(windows, self.get_arma_params)
-        self.save_data(self.features)
+        self.save_data(self.features, file_name)
         return self.features
 
     def get_windows(self, timeseries):
@@ -73,15 +73,11 @@ class DataProcessor:
         # result = model.fit(trend='nc', disp=0)
         return result.params
     
-    def save_data(self, data):
-        """Write data to features.npy file.
+    def save_data(self, data, file_name):
+        """Write data to csv file.
         """
-        np.save('{}'.format(self.data_file), data)
-
-    def load_data(self):
-        """Load data from features.npy file.
-        """
-        return np.load('{}.npy'.format(self.data_file))
+        df = pd.DataFrame(data) 
+        df.to_csv('data/{}.csv'.format(file_name), header=False, index=False) 
 
     def print_features(self):
         for feature in self.features:
