@@ -1,6 +1,6 @@
 brew install python3
 brew install jupyter
-pip3 install numpy scipy matplotlib pandas sympy nose statsmodels
+pip install  keras matplotlib nose numpy pandas scipy sklearn statsmodels sympy tensorflow tqdm
 
 
 
