@@ -1,6 +1,7 @@
 # Source: https://www.statsmodels.org/stable/_modules/statsmodels/tsa/arima_process.html#arma_generate_sample
 from scipy import signal
 import numpy as np
+import pandas as pd
 import statsmodels.tsa.arima_process as arima
 import statsmodels.tsa as sm
 import matplotlib.pyplot as plt
@@ -27,7 +28,7 @@ class DataGenerator:
         self.window_count = window_count
         self.nsample = window_count * window_size  # number of observations/samples
 
-    def generate_data(self, plot_data=True):
+    def generate_data(self, plot_data=True, file_name='generated_data'):
         """Stitch together two time series with different  ARMA parameters
         to generate one timeseries which contains anomalies.
 
@@ -61,7 +62,7 @@ class DataGenerator:
         if plot_data:
             self.visualize(stitched_data)
 
-        self.save_data(stitched_data)
+        self.save_data(stitched_data, file_name)
         return stitched_data
 
     def arma_generate_sample(self, ar, ma):
@@ -88,15 +89,16 @@ class DataGenerator:
         maparams = np.r_[1, maparams]  # add zero-lag
         return arparams, maparams
     
-    def save_data(self, data):
-        """Write data to generated_data.npy file.
+    def save_data(self, data, file_name):
+        """Write data to pandas csv file.
         """
-        np.save('data/generated_data', data)
+        df = pd.DataFrame(data) 
+        df.to_csv('data/{}.csv'.format(file_name), header=False, index=False) 
 
-    def load_data(self):
+    def load_data(self, file_name='generated_data'):
         """Load data from generated_data.npy file.
         """
-        return np.load('data/generated_data.npy')
+        return np.load('data/{file_name}.npy'.format(file_name))
 
     def visualize(self, data):
         """Plot the generated (stitched) data containing the anomalies.
