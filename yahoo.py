@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 def load_files(path, file_count):
     '''Load multiple files from a path in correct order.
     '''
-    file_numers = np.arange(1, file_count)
+    file_numers = np.arange(1, file_count + 1)
     file_list = []
 
     for number in file_numers:
