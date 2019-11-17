@@ -11,4 +11,21 @@ setup.generate_training_data(file_name_training)
 setup.generate_test_data(file_name_test)
 
 # Use autoencoder to detect anomalies
-encoder.run(file_name_training_features, file_name_test_features)
+regularization_strengths = [0.0, 0.0001, 0.001, 0.01, 0.1]
+
+for regularization_strength in regularization_strengths:
+
+    print('Running with regularization_strength: {}'.format(
+        regularization_strength
+    ))
+
+    encoder.run(
+        file_name_training_features,
+        file_name_test_features,
+        regularization_strength
+    )
+
+
+
+# result_file_name = 'autoencoder_anomaly_scores_same_train_test_regularization_dense_0_1'
+# encoder.load_and_show(result_file_name, 0.1)

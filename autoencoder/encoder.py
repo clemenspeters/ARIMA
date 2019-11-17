@@ -8,24 +8,48 @@ import pandas as pd
 # from IPython.display import display, HTML 
 import tensorflow as tf
 from tqdm import tqdm
+import matplotlib.pyplot as plt
+plt.style.use('ggplot')
+from tensorflow.keras.regularizers import l1
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation
 
 
-def run(file_name_training, file_name_test):
+def visualize_and_save(data, file_name, regularization_strength):
+    axes = plt.gca()
+    axes.set_ylim([0, 1])
+    plt.plot(data) # plotting by columns
+    plt.title('regularization_strength: {}'.format(regularization_strength))
+    file_path = 'results/{}.png'.format(file_name)
+    plt.savefig(file_path)
+    plt.clf()
+    print('Saved image {}'.format(file_path))
+    # plt.show()
+
+
+def run(file_name_training, file_name_test, regularization_strength):
     # Load data from files
     features_training = pd.read_csv('./data/{}.csv'.format(file_name_training))
     features_test = pd.read_csv('./data/{}.csv'.format(file_name_test))
     # Format data. TODO: refactor
     x_normal = np.array(features_training)
-    x_normal_train = np.array(features_training)
+    # x_normal_train = np.array(features_training)
+    x_normal_train = np.array(features_test) # TODO: change back to features_training!
     x_normal_test = np.array(features_test)
 
 
     # Train autoencoder network
+    encoding_dim = 2
     model = Sequential()
+    # Input layer
     model.add(Dense(25, input_dim=x_normal.shape[1], activation='relu'))
-    model.add(Dense(2, activation='relu'))
+    # Hidden layer
+    model.add(Dense(
+        encoding_dim,
+        activation='relu',
+        activity_regularizer=l1(regularization_strength)
+    ))
+    # Output layer
     model.add(Dense(25, activation='relu'))
     model.add(Dense(x_normal.shape[1])) # Multiple output neurons
     model.compile(loss='mean_squared_error', optimizer='adam')
@@ -50,12 +74,14 @@ def run(file_name_training, file_name_test):
         count += 1
     
     # Save predictions (anomaly scores)
+    # result_file_name = 'autoencoder_anomaly_scores_1000_1600'
+    result_file_name = 'autoencoder_anomaly_scores_same_train_test_regularization_dense_{}'.format(str(regularization_strength).replace('.', '_'))
     df = pd.DataFrame(predictions) 
-    df.to_csv('results/autoencoder_anomaly_scores_100_1600.csv', header=False, index=False) 
+    df.to_csv('results/{}.csv'.format(result_file_name), header=False, index=False) 
 
-    # Visualize predictions
-    import matplotlib.pyplot as plt
-    plt.style.use('ggplot')
-    plt.plot(predictions) # plotting by columns
-    plt.savefig('results/autoencoder_anomaly_scores_100_1600.png')
-    plt.show()
+    visualize_and_save(predictions, result_file_name, regularization_strength)
+
+
+def load_and_show(file_name, regularization_strength):
+    data = pd.read_csv('results/{}.csv'.format(file_name))
+    visualize_and_save(data, file_name, regularization_strength)
