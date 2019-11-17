@@ -9,9 +9,8 @@ from sklearn.ensemble import IsolationForest
 from sklearn.neighbors import LocalOutlierFactor
 
 
-class AnomalyDetector:
 # See: https://scikit-learn.org/stable/auto_examples/plot_anomaly_comparison.html#sphx-glr-auto-examples-plot-anomaly-comparison-py
-
+class AnomalyDetector:
     def __init__(self, outliers_fraction, window_size, file):
         self.outliers_fraction = outliers_fraction
         self.window_size = window_size
@@ -19,7 +18,10 @@ class AnomalyDetector:
         self.file = file
         # define outlier/anomaly detection methods to be compared
         self.anomaly_algorithms = [
-            ("Robust covariance", EllipticEnvelope(contamination=outliers_fraction)),
+            (
+                "Robust covariance", 
+                EllipticEnvelope(contamination=outliers_fraction)
+            ),
             (
                 "One-Class SVM", 
                 svm.OneClassSVM(
