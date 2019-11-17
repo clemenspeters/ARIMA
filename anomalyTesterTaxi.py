@@ -9,45 +9,63 @@ plt.style.use('ggplot')
 
 
 """
-    date                        ,  csv/github,  data-index, window-inde
-    "2014-11-01 19:00:00.000000",  5944,        5942,       118, 117 // 
-    "2014-11-27 15:30:00.000000",  7185,        7183,       143, 142
-    "2014-12-25 15:00:00.000000",  8528,        8526,       170, 169
-    "2015-01-01 01:00:00.000000",  8836,        8834,       176, 175 //
-    "2015-01-27 00:00:00.000000", 10082,        10080,      201, 200
+    date                        ,  csv/github,  anomaly-data-index,     anomaly-window-indecies
+    "2014-11-01 19:00:00.000000",  5944,        5942,                   118, 117
+    "2014-11-27 15:30:00.000000",  7185,        7183,                   143, 142
+    "2014-12-25 15:00:00.000000",  8528,        8526,                   170, 169
+    "2015-01-01 01:00:00.000000",  8836,        8834,                   176, 175
+    "2015-01-27 00:00:00.000000", 10082,        10080,                  201, 200
 
 """
 
 
-def visualize(data, title):
+
+def anomalies_index_to_window_index(window_size, anomalies):
+    stride = window_size / 2
+    anomaly_windows = []
+    for anomaly in anomalies:
+        window = int(anomaly / stride)
+        anomaly_windows.append(window - 1)
+        anomaly_windows.append(window)
+    return anomaly_windows
+
+
+def visualize(data, anomalies, title):
     """Plot the generated (stitched) data containing the anomalies.
     """
     fig = plt.figure(1, figsize=(12, 3))
     ax1 = fig.add_subplot(111)
+
     # Generate title to show window count and anomaly window
     ax1.title.set_text(title)
-    ax1.plot(np.arange(data.size), data)
+    ax1.plot(np.arange(data.size), data, color='blue')
+    # Add anomaly markers
+    for anomaly_index in anomalies:
+        ax1.scatter(anomaly_index, data[anomaly_index], marker='x', color='red')
     plt.tight_layout() # avoid overlapping plot titles
     fig.savefig('results/numenta/taxi_data.png')
-    plt.show()
+    # plt.show()
 
 
 window_size = 100
-# anomalies = [118, 143, 170, 176, 201] # indecies of windows
-anomalies = [117,118, 142,143, 169,170, 175,176, 200,201] # indecies of windows
+anomalies = [5942, 7183, 8526, 8834, 10080] # indecies of anomaly timeseries datapoints
+# Load timeseries data from csv file
+data = pd.read_csv('data/Numenta/data/realKnownCause/nyc_taxi.csv').values[:, 1]
+# print('number of data points:', timesteps)
+visualize(data, anomalies, 'NYC Taxi data')
 
-csv_data = pd.read_csv('data/Numenta/data/realKnownCause/nyc_taxi.csv')
-data = np.array(csv_data[['value']].get_values())[:, 0]
-print('number of data points:', data.shape[0])
-# visualize(data, 'NYC Taxi data')
+# anomaly_windows = [117,118, 142,143, 169,170, 175,176, 200,201] # two windows per anomaly
+anomaly_windows = anomalies_index_to_window_index(window_size, anomalies)
+print(anomaly_windows)
 
 # Generate features
-processor = dataProcessor.DataProcessor(window_size, anomalies, 'results/numenta/taxi_features')
-# features = processor.reduce_arma(data)
-features = processor.load_data()
-processor.visualize_features(features)
-print('number of features:', features.shape[0])
+processor = dataProcessor.DataProcessor(window_size, anomaly_windows)
+features_file_name = 'numenta/taxi_features'
+features = processor.reduce_arma(data, features_file_name)
+features = pd.read_csv('data/{}.csv'.format(features_file_name)).values
+processor.visualize_features(features, features_file_name)
 
+# Detect anomalies
 outliers_fraction = 10 / 205
 detector = anomalyDetector.AnomalyDetector(
     outliers_fraction, 
