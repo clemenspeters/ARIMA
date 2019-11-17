@@ -3,6 +3,7 @@ import pandas as pd
 import dataGenerator
 import dataProcessor
 import anomalyDetector
+import utils
 
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
@@ -18,16 +19,6 @@ plt.style.use('ggplot')
 
 """
 
-
-
-def anomalies_index_to_window_index(window_size, anomalies):
-    stride = window_size / 2
-    anomaly_windows = []
-    for anomaly in anomalies:
-        window = int(anomaly / stride)
-        anomaly_windows.append(window - 1)
-        anomaly_windows.append(window)
-    return anomaly_windows
 
 
 def visualize(data, anomalies, title):
@@ -51,11 +42,10 @@ window_size = 100
 anomalies = [5942, 7183, 8526, 8834, 10080] # indecies of anomaly timeseries datapoints
 # Load timeseries data from csv file
 data = pd.read_csv('data/Numenta/data/realKnownCause/nyc_taxi.csv').values[:, 1]
-# print('number of data points:', timesteps)
 visualize(data, anomalies, 'NYC Taxi data')
 
 # anomaly_windows = [117,118, 142,143, 169,170, 175,176, 200,201] # two windows per anomaly
-anomaly_windows = anomalies_index_to_window_index(window_size, anomalies)
+anomaly_windows = utils.anomalies_index_to_window_index(anomalies, window_size)
 print(anomaly_windows)
 
 # Generate features
