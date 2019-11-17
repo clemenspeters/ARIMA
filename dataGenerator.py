@@ -6,7 +6,6 @@ import statsmodels.tsa.arima_process as arima
 import statsmodels.tsa as sm
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
-np.random.seed(12345)
 
 class DataGenerator:
     """
@@ -28,7 +27,8 @@ class DataGenerator:
         self.window_count = window_count
         self.nsample = window_count * window_size  # number of observations/samples
 
-    def generate_data(self, plot_data=True, file_name='generated_data'):
+    def generate_data(self, plot_data=True, file_name='generated_data', seed=12345):
+        np.random.seed(seed)
         """Stitch together two time series with different  ARMA parameters
         to generate one timeseries which contains anomalies.
 
@@ -42,7 +42,7 @@ class DataGenerator:
         stitched_data: array
             Data containing anomalies.
         """
-        # # Genrate the two timeseries (with different ARMA parameters)
+        # Genrate the two timeseries (with different ARMA parameters)
         ar, ma = self.arma_generate_params([.75, -.25], [.65, .35])
         default_series = arima.arma_generate_sample(ar, ma, self.nsample)
 
@@ -59,8 +59,7 @@ class DataGenerator:
             # Inject anomalies
             stitched_data[start : end] =  anomaly_series[start : end]
 
-        if plot_data:
-            self.visualize(stitched_data)
+        self.create_data_plot(stitched_data, file_name, plot_data)
 
         self.save_data(stitched_data, file_name)
         return stitched_data
@@ -93,14 +92,16 @@ class DataGenerator:
         """Write data to pandas csv file.
         """
         df = pd.DataFrame(data) 
-        df.to_csv('data/{}.csv'.format(file_name), header=False, index=False) 
+        file_path = 'data/{}.csv'.format(file_name)
+        df.to_csv(file_path, header=False, index=False) 
+        print('Saved data in {}.'.format(file_path))
 
     def load_data(self, file_name='generated_data'):
         """Load data from generated_data.npy file.
         """
-        return np.load('data/{file_name}.npy'.format(file_name))
+        return np.load('data/{}.npy'.format(file_name))
 
-    def visualize(self, data):
+    def create_data_plot(self, data, file_name, show_plot):
         """Plot the generated (stitched) data containing the anomalies.
         """
         fig = plt.figure(1, figsize=(12, 3))
@@ -109,14 +110,18 @@ class DataGenerator:
         ax1.title.set_text(self.get_title())
         ax1.plot(np.arange(self.nsample), data)
         plt.tight_layout() # avoid overlapping plot titles
-        fig.savefig('img/data.png')
-        plt.show()
+        file_path = 'img/{}.png'.format(file_name)
+        fig.savefig(file_path)
+        print('Saved data plot in {}.'.format(file_path))
+        if show_plot:
+            plt.show()
+        plt.clf()
 
     def get_title(self):
         """
         Generate title for the data plot containing all anomalies.
         """
-        title = 'Generated training data. {} windows stitched together. Window size = {}.'.format(
+        title = 'Generated training data.\n{} windows stitched together.\nWindow size = {}.'.format(
             self.window_count, 
             self.window_size,
         )
@@ -124,7 +129,7 @@ class DataGenerator:
         for anomaly in self.anomalies:
             start = anomaly * self.window_size
             end = (anomaly + 1) * self.window_size
-            anomaliesStr +=  ' ({}:{})'.format(start, end)
+            anomaliesStr +=  '\n({}:{})'.format(start, end)
         return title + anomaliesStr
 
     def show_raw_data(self, default_series, anomaly_series):

@@ -33,8 +33,7 @@ def run(file_name_training, file_name_test, regularization_strength):
     features_test = pd.read_csv('./data/{}.csv'.format(file_name_test))
     # Format data. TODO: refactor
     x_normal = np.array(features_training)
-    # x_normal_train = np.array(features_training)
-    x_normal_train = np.array(features_test) # TODO: change back to features_training!
+    x_normal_train = np.array(features_training)
     x_normal_test = np.array(features_test)
 
 

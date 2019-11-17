@@ -7,4 +7,15 @@ rather than a production ready perfect project right now.
 
 ## Autoencoder
 
-Run `python3 autoencoderExample.py`
+Run:
+
+```
+python3 autoencoderExample.py
+```  
+
+or to record logs:
+
+```
+python3 autoencoderExample.py | tee autoencoder/log.txt
+``` 
+

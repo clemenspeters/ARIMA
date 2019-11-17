@@ -77,13 +77,16 @@ class DataProcessor:
         """Write data to csv file.
         """
         df = pd.DataFrame(data) 
-        df.to_csv('data/{}.csv'.format(file_name), header=False, index=False) 
+        file_path = 'data/{}.csv'.format(file_name)
+        df.to_csv(file_path, header=False, index=False) 
+        print('Saved features in {}.'.format(file_path))
 
     def print_features(self):
         for feature in self.features:
             print(feature)
 
-    def visualize_features(self, features, method='TSNE'):
+    def visualize_features(self, features, file_name, method='TSNE'):
+        print('Visualize features using {}...'.format(method))
         if (method == 'TSNE'):
             embedded = TSNE(n_components=2).fit_transform(features)
             fig = plt.figure()
@@ -108,7 +111,10 @@ class DataProcessor:
                         plt.annotate('Anomaly: {}'.format(txt), (embedded[i, 0], embedded[i, 1]))
             plt.title('TSNE embedded features\n. {}'.format(anomaliesStr))
             fig.tight_layout()
-            fig.savefig('{}_TSNE-features.png'.format(self.data_file))
+            file_path = 'data/{}_TSNE-features.png'.format(file_name)
+            fig.savefig(file_path)
+            print('Saved {} visualized features using {}'.format(method, file_path))
             # Show the plot in non-blocking mode
             plt.show()
+            plt.clf()
 
