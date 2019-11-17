@@ -2,8 +2,9 @@ from sklearn.manifold import TSNE
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import statsmodels.api as sm
 plt.style.use('ggplot')
+import statsmodels.api as sm
+import umap
 
 
 class DataProcessor:
@@ -87,9 +88,9 @@ class DataProcessor:
 
     def visualize_features(self, features, file_name, method='TSNE'):
         print('Visualize features using {}...'.format(method))
+        fig = plt.figure()
         if (method == 'TSNE'):
             embedded = TSNE(n_components=2).fit_transform(features)
-            fig = plt.figure()
             plt.scatter(embedded[:, 0], embedded[:, 1])
              # Add labels and color to anomaly datapoints
             if (len(self.window_labels) < 1):
@@ -117,4 +118,15 @@ class DataProcessor:
             # Show the plot in non-blocking mode
             plt.show()
             plt.clf()
+
+        elif (method == 'UMAP'):
+            reducer = umap.UMAP()
+            embedding = reducer.fit_transform(features)
+            embedding.shape
+            # plt.scatter(embedding[:, 0], embedding[:, 1], c=[sns.color_palette()[x] for x in iris.target])
+            plt.scatter(embedding[:, 0], embedding[:, 1])
+            plt.gca().set_aspect('equal', 'datalim')
+            plt.title('UMAP projection of the features', fontsize=24);
+            fig.tight_layout()
+            plt.show()
 
