@@ -48,7 +48,8 @@ def visualize_features(file_name):
     anomalies = [500, 1000, 1500, 2000, 2500, 2800]
     processor = dataProcessor.DataProcessor(window_size, anomalies)
     features = pd.read_csv('data/{}.csv'.format(file_name)).values
-    processor.visualize_features(features, file_name)
+    processor.visualize_features(features, file_name, 'TSNE')
+    processor.visualize_features(features, file_name, 'UMAP')
 
 generate_data_and_features()
 visualize_features(file_name_training_features)

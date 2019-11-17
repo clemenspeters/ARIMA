@@ -88,45 +88,60 @@ class DataProcessor:
 
     def visualize_features(self, features, file_name, method='TSNE'):
         print('Visualize features using {}...'.format(method))
-        fig = plt.figure()
         if (method == 'TSNE'):
             embedded = TSNE(n_components=2).fit_transform(features)
-            plt.scatter(embedded[:, 0], embedded[:, 1])
-             # Add labels and color to anomaly datapoints
-            if (len(self.window_labels) < 1):
-                start = 0
-                end = self.window_size
-                for i, feature in enumerate(features):
-                    self.window_labels.append([start, end])
-                    start = int( start + self.stride)
-                    end = int( end + self.stride)
-            anomaliesStr = ' Anomalies:'
-            for anomaly in self.anomalies:
-                start = anomaly * self.stride
-                end = start + self.window_size
-                for i, txt in enumerate(self.window_labels):
-                    if (txt == [start, end]):
-                        print(i)
-                        plt.scatter(embedded[i, 0], embedded[i, 1], c='green')
-                        anomaliesStr +=  '(x={}, y={})\n'.format(embedded[i, 0], embedded[i, 1])
-                        plt.annotate('Anomaly: {}'.format(txt), (embedded[i, 0], embedded[i, 1]))
-            plt.title('TSNE embedded features\n. {}'.format(anomaliesStr))
-            fig.tight_layout()
-            file_path = 'data/{}_TSNE-features.png'.format(file_name)
-            fig.savefig(file_path)
-            print('Saved {} visualized features using {}'.format(method, file_path))
-            # Show the plot in non-blocking mode
-            plt.show()
-            plt.clf()
-
+            self.plot_highlighted_anomalies(
+                features,
+                embedded,
+                file_name,
+                method
+            )
         elif (method == 'UMAP'):
             reducer = umap.UMAP()
-            embedding = reducer.fit_transform(features)
-            embedding.shape
-            # plt.scatter(embedding[:, 0], embedding[:, 1], c=[sns.color_palette()[x] for x in iris.target])
-            plt.scatter(embedding[:, 0], embedding[:, 1])
-            plt.gca().set_aspect('equal', 'datalim')
-            plt.title('UMAP projection of the features', fontsize=24);
-            fig.tight_layout()
-            plt.show()
+            embedded = reducer.fit_transform(features)
+            self.plot_highlighted_anomalies(
+                features,
+                embedded,
+                file_name,
+                method
+            )
 
+
+    def plot_highlighted_anomalies(self, features, embedded, file_name, method):
+        '''Add labels and color to anomaly datapoints
+        '''
+        fig = plt.figure()
+        plt.scatter(embedded[:, 0], embedded[:, 1], c='blue')
+        if (len(self.window_labels) < 1):
+            start = 0
+            end = self.window_size
+            for i, feature in enumerate(features):
+                self.window_labels.append([start, end])
+                start = int( start + self.stride)
+                end = int( end + self.stride)
+        anomalies_str = ' Anomalies:'
+        for anomaly in self.anomalies:
+            start = anomaly * self.stride
+            end = start + self.window_size
+            for i, txt in enumerate(self.window_labels):
+                if (txt == [start, end]):
+                    plt.scatter(embedded[i, 0], embedded[i, 1], c='red')
+                
+                    anomalies_str +=  '(x={}, y={})\n'.format(
+                        embedded[i, 0], 
+                        embedded[i, 1]
+                    )
+
+                    plt.annotate(
+                        'Anomaly: {}'.format(txt), 
+                        (embedded[i, 0], embedded[i, 1])
+                    )
+        plt.title(
+            '{} projection of the features\n {}'.format(method, anomalies_str)
+        )
+        fig.tight_layout()
+        file_path = 'data/{}_{}-features.png'.format(file_name, method)
+        fig.savefig(file_path)
+        plt.show()
+        plt.clf()
+        print('Saved {} visualized features using {}'.format(method, file_path))
