@@ -75,6 +75,18 @@ class TaxiDataFileProcessor:
             tc.GREEN, report_file, tc.END
         ))
 
+    def is_invalid_line(self, line_number, line, columns):
+        if len(columns) < self.passenger_index:
+            print(tc.RED)
+            print("Unexpected line #{}: '{}' in {}".format(
+                line_number, line, self.source_file
+            ))
+            print(tc.END)
+
+            return True
+
+        return False
+
     def process_file(self):
         with open(self.source_file) as f:
 
@@ -92,6 +104,8 @@ class TaxiDataFileProcessor:
                     continue  # Skip header
 
                 columns = line.split(',')
+                if self.is_invalid_line(i + 1, line, columns):
+                    continue
                 pickup_date_time = columns[self.pickup_index] # Choose pickup column
                 passenger_count = columns[self.passenger_index]
                 bucket_name = self.get_bucket_name(pickup_date_time)
