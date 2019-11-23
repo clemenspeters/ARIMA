@@ -4,7 +4,6 @@ import dataGenerator
 import dataProcessor
 import anomalyDetector
 import utils
-
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 
@@ -19,8 +18,6 @@ plt.style.use('ggplot')
 
 """
 
-
-
 def visualize(data, anomalies, title):
     """Plot the generated (stitched) data containing the anomalies.
     """
@@ -29,12 +26,12 @@ def visualize(data, anomalies, title):
 
     # Generate title to show window count and anomaly window
     ax1.title.set_text(title)
-    ax1.plot(np.arange(data.size), data, color='blue')
+    ax1.plot(np.arange(data.size), data, color='blue', zorder=-1)
     # Add anomaly markers
     for anomaly_index in anomalies:
-        ax1.scatter(anomaly_index, data[anomaly_index], marker='x', color='red')
+        ax1.scatter(anomaly_index, data[anomaly_index], marker='x', color='red', zorder=1)
     plt.tight_layout() # avoid overlapping plot titles
-    fig.savefig('results/numenta/taxi_data.png')
+    fig.savefig('taxi_nyc_numenta_data/taxi_data.png')
     # plt.show()
 
 
@@ -50,9 +47,9 @@ print(anomaly_windows)
 
 # Generate features
 processor = dataProcessor.DataProcessor(window_size, anomaly_windows)
-features_file_name = 'numenta/taxi_features'
+features_file_name = 'taxi_nyc_numenta_data/taxi_features'
 features = processor.reduce_arma(data, features_file_name)
-features = pd.read_csv('data/{}.csv'.format(features_file_name)).values
+features = pd.read_csv('{}.csv'.format(features_file_name)).values
 processor.visualize_features(features, features_file_name)
 
 # Detect anomalies
@@ -60,6 +57,6 @@ outliers_fraction = 10 / 205
 detector = anomalyDetector.AnomalyDetector(
     outliers_fraction, 
     window_size,
-    'results/numenta/anomalies'
+    'taxi_nyc_numenta_data/anomalies'
 )
 detector.detect_anomalies(features)

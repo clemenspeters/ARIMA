@@ -20,7 +20,7 @@ The raw data is from the [NYC Taxi and Limousine Commission](https://www1.nyc.go
 For other datasets please also see [The Numenta Anomaly Benchmark](https://github.com/numenta/NAB).
 
 ```console
-python3 taxi_nyc.py | tee log_taxi.txt
+python3 taxi_nyc_numenta_data.py | tee taxi_nyc_numenta_data/log_taxi.txt
 ```
 
 ### [Data processing pipeline](./aws_lambda_taxi_data/README.md)
