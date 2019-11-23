@@ -11,6 +11,7 @@ sns = boto3.client('sns')
 base_url = 'https://s3.amazonaws.com/nyc-tlc/trip+data/'
 years = range(2009, 2020)
 months = range(1,13)
+is_dry_run = False
 
 
 def publish(subject, msg):
@@ -29,29 +30,16 @@ def iterate_files():
             dataset_name = "yellow_tripdata_{}-{}".format(year, formatted_month)
             filename = "{}.csv".format(dataset_name)
             url = "{}{}".format(base_url, filename)
-            # dry_run_download(url)
             msg = 'https://s3.amazonaws.com/nyc-tlc/trip+data/{}'.format(filename)
-            publish(filename, msg)
+            if not is_dry_run:
+                publish(filename, msg)
             print('Sent: ', filename, url, topc_arn)
 
 def lambda_handler(event, context):
-
-    # This function receives JSON input with three fields: the ARN of an SNS topic,
-    # a string with the subject of the message, and a string with the body of the message.
-    # The message is then sent to the SNS topic.
-    #
-    # Example:
-    #   {
-    #       "topic": "arn:aws:sns:REGION:123456789012:MySNSTopic",
-    #       "subject": "This is the subject of the message.",
-    #       "message": "This is the body of the message."
-    #   }
-
-    # filename = 'yellow_tripdata_2009-03.csv'
-    # msg = 'https://s3.amazonaws.com/nyc-tlc/trip+data/{}'.format(filename)
-    # publish(filename, msg)
-    # return ('Sent a message to an Amazon SNS topic.')
-
     iterate_files()
-    return ('Sent all messages for yellow taxi to SNS.')
+    if is_dry_run:
+        print ('Dry run complete. No messages published.')
+        return
+    print ('Sent all messages for yellow taxi to SNS.')
     
+
