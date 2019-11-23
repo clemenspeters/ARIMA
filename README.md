@@ -23,6 +23,10 @@ For other datasets please also see [The Numenta Anomaly Benchmark](https://githu
 python3 taxi_nyc.py | tee log_taxi.txt
 ```
 
+### [Data processing pipeline](./aws_lambda_taxi_data/README.md)
+
+![Infrastructure](./aws_lambda_taxi_data/processor_internal_data/img/infrastructure_serverless_data_processing_internal_data_scale.png)
+
 ## Yahoo S5 dataset
 
 Please request and download dataset from [yahoo](https://webscope.sandbox.yahoo.com/catalog.php?datatype=s&did=70).

@@ -38,7 +38,7 @@ than 10 Minutes on AWS Lambda and s3 with very little server cost.
 
 There are two implementations:
 
-## External data
+## [External data pipeline](./processor_external_data/README.md)
 
 The data is streamed from the original (external) s3 bucket and directly  
 processed.
@@ -53,7 +53,11 @@ account (only results are stored, no raw data).
 In case the original raw data is removed, we loose access (dependency on third  
 party).
 
-## Internal data
+### Infrastructure
+
+![Infrastructure](./processor_external_data/img/infrastructure_serverless_data_processing_external_data_scale.png)
+
+## [Internal data pipeline](./processor_internal_data/README.md)
 
 The data is streamed from the original (external) s3 bucket and directly  
 processed.
@@ -67,3 +71,7 @@ In case the original raw data is removed, we have it save in our own s3 bucket
 
 Slightly more complex to setup (extra download step), over 200GB s3 storage  
 usage in your own AWS account (all raw data is duplicated to your s3 bucket).
+
+### Infrastructure
+
+![Infrastructure](./processor_internal_data/img/infrastructure_serverless_data_processing_internal_data_scale.png)
