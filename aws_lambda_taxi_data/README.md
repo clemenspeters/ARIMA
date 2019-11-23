@@ -75,3 +75,38 @@ usage in your own AWS account (all raw data is duplicated to your s3 bucket).
 ### Infrastructure
 
 ![Infrastructure](./processor_internal_data/img/infrastructure_serverless_data_processing_internal_data_scale.png)
+
+## Useful terminal commands
+
+### Create new lambda function
+
+```bash
+aws lambda create-function --function-name processTaxiDataSimple \
+--zip-file fileb://Archiv.zip --handler lambda_function.lambda_handler --runtime python3.7 \
+--role arn:aws:iam::348499957229:role/lambdaS3
+```
+
+### Zip all files in current directory to Archive.zip in parent directory
+
+```bash
+zip -q -r -X "../Archive.zip" *
+```
+
+### Insert/Update lambda_function.py in Archive.zip
+
+```bash
+zip -ur  -X "../Archive.zip" lambda_function.py
+```
+
+### Deploy to lambda
+
+```bash
+aws lambda update-function-code --function-name <value> \
+--zip-file fileb://Archive.zip
+```
+
+### Download entire s3 bucket folder (to get the processed data)
+
+```bash
+aws s3 sync s3://timeseries-anomaly/report/ ./output
+```
