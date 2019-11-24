@@ -43,3 +43,9 @@ BLUEBG2   = '\33[104m'
 VIOLETBG2 = '\33[105m'
 BEIGEBG2  = '\33[106m'
 WHITEBG2  = '\33[107m'
+
+def green(string_to_print):
+    print(GREEN + string_to_print + END);
+
+def yellow(string_to_print):
+    print(YELLOW + string_to_print + END);

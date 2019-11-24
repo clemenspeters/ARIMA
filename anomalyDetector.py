@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib
+import terminalColors as tc
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
-
 from sklearn.covariance import EllipticEnvelope
 from sklearn import svm
 from sklearn.ensemble import IsolationForest
@@ -47,11 +47,12 @@ class AnomalyDetector:
             )
         ]
 
-    def detect_anomalies(self, X):
+    def detect_anomalies(self, X, show=False):
         plot_num = 1
         plt.figure(figsize=(len(self.anomaly_algorithms) * 2 + 3, 6))
 
         for name, algorithm in self.anomaly_algorithms:
+            tc.yellow('Detecting anomalies using {}...'.format(name))
             algorithm.fit(X)
             plt.subplot(1, len(self.anomaly_algorithms), plot_num)
             plt.title(name, size=18)
@@ -66,8 +67,10 @@ class AnomalyDetector:
             self.plot_anomalies(name, X, y_pred, plt)
             plot_num += 1
         plt.tight_layout()
-        plt.savefig('{}.png'.format(self.file))
-        plt.show()
+        plt.savefig(self.file)
+        tc.green('Saved anomaly plot to {}'.format(self.file))
+        if show:
+            plt.show()
 
     def plot_anomalies(self, name, X, y_pred, plt):
         # Create scatter plot

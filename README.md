@@ -23,6 +23,8 @@ For other datasets please also see [The Numenta Anomaly Benchmark](https://githu
 python3 taxi_nyc_numenta_data.py | tee taxi_nyc_numenta_data/log_taxi.txt
 ```
 
+Please find results in ./taxi_nyc_numenta_data.
+
 ### [Data processing pipeline](./aws_lambda_taxi_data/README.md)
 
 ![Infrastructure](./aws_lambda_taxi_data/processor_internal_data/img/infrastructure_serverless_data_processing_internal_data_scale.png)
@@ -33,4 +35,18 @@ Please request and download dataset from [yahoo](https://webscope.sandbox.yahoo.
 
 ```console
 python3 yahoo.py | tee log_yahoo.txt
+```
+
+## Generated times series
+
+Two time series are generate from two ARMA models with different parameters.  
+Then they are combined into one time series which contains anomalies.
+On this time series we use moving windows and train fit an ARMA model on each  
+window. The parameters of these fitted models are our features.  
+Finally we use four algorithms to detect anomalies in that feature set  
+(Robust covariance, One-Class SVM, Isolation Forest,Local Outlier Factor).
+Please find results in ./results/generated
+
+```console
+python3 anomalyTester.py | tee results/generated/log.txt
 ```

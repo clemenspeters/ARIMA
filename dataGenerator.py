@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import statsmodels.tsa.arima_process as arima
 import statsmodels.tsa as sm
+import terminalColors as tc
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 
@@ -21,20 +22,21 @@ class DataGenerator:
     anomalies : array
         Indices of the windows containing anomalies.\n
     """
-    def __init__(self, window_count, window_size, anomalies):
+    def __init__(self, window_count, window_size, anomalies, file_name):
         self.anomalies = anomalies
         self.window_size = window_size
         self.window_count = window_count
         self.nsample = window_count * window_size  # number of observations/samples
+        self.file_name = file_name
 
-    def generate_data(self, plot_data=True, file_name='generated_data', seed=12345):
+    def generate_timeseries(self, show=True, seed=12345):
         np.random.seed(seed)
         """Stitch together two time series with different  ARMA parameters
         to generate one timeseries which contains anomalies.
 
         Parameters
         ----------
-        plot_data : bool
+        show : bool
             Show generated data as plots.
         
         Returns
@@ -43,15 +45,26 @@ class DataGenerator:
             Data containing anomalies.
         """
         # Genrate the two timeseries (with different ARMA parameters)
+        tc.yellow('Generating normal timeseries...')
         ar, ma = self.arma_generate_params([.75, -.25], [.65, .35])
         default_series = arima.arma_generate_sample(ar, ma, self.nsample)
+        default_series = pd.DataFrame(default_series, columns=['value'])
+        default_series['is_anomaly'] = int(0)
 
+        tc.yellow('Generating anomaly timeseries...')
         ar, ma = self.arma_generate_params([.75, -.25], [-.65, .35])
         anomaly_series = arima.arma_generate_sample(ar, ma, self.nsample)
+        anomaly_series = pd.DataFrame(anomaly_series, columns=['value'])
+        anomaly_series['is_anomaly'] = int(1)
+
         # Plot the two timeseries
-        if plot_data:
+        if show:
             self.show_raw_data(default_series, anomaly_series)
-        # Combine the two timeseries to get one time series containing anomalies
+        
+        tc.yellow(
+            'Combining the two timeseries to get one time series'
+            'containing anomalies...'
+        )
         stitched_data = default_series
         for anomaly in self.anomalies:
             start = anomaly * self.window_size
@@ -59,10 +72,10 @@ class DataGenerator:
             # Inject anomalies
             stitched_data[start : end] =  anomaly_series[start : end]
 
-        self.create_data_plot(stitched_data, file_name, plot_data)
+        self.create_data_plot(stitched_data, show)
 
-        self.save_data(stitched_data, file_name)
-        return stitched_data
+        self.save_data(stitched_data)
+        return pd.DataFrame(stitched_data) 
 
     def arma_generate_sample(self, ar, ma):
         """
@@ -88,34 +101,30 @@ class DataGenerator:
         maparams = np.r_[1, maparams]  # add zero-lag
         return arparams, maparams
     
-    def save_data(self, data, file_name):
+    def save_data(self, data):
         """Write data to pandas csv file.
         """
         df = pd.DataFrame(data) 
-        file_path = 'data/{}.csv'.format(file_name)
-        df.to_csv(file_path, header=False, index=False) 
-        print('Saved data in {}.'.format(file_path))
+        file_path = '{}.csv'.format(self.file_name)
+        df.to_csv(file_path, index=False) 
+        tc.green('Saved data in {}.'.format(file_path))
 
-    def load_data(self, file_name='generated_data'):
-        """Load data from generated_data.npy file.
-        """
-        return np.load('data/{}.npy'.format(file_name))
-
-    def create_data_plot(self, data, file_name, show_plot):
+    def create_data_plot(self, data, show):
         """Plot the generated (stitched) data containing the anomalies.
         """
-        fig = plt.figure(1, figsize=(12, 3))
-        ax1 = fig.add_subplot(111)
-        # Generate title to show window count and anomaly window
-        ax1.title.set_text(self.get_title())
-        ax1.plot(np.arange(self.nsample), data)
+        fig = plt.figure()
+        plt.title(self.get_title())
+        cmap = ['b', 'r']
+        # plt.plot(data.mask((data['is_anomaly'] == 1))['value'], color='blue')
+        plt.plot(data['value'], color='blue')
+        plt.plot(data.mask((data['is_anomaly'] == 0))['value'], color='red')
         plt.tight_layout() # avoid overlapping plot titles
-        file_path = 'img/{}.png'.format(file_name)
+        file_path = '{}.png'.format(self.file_name)
         fig.savefig(file_path)
-        print('Saved data plot in {}.'.format(file_path))
-        if show_plot:
+        tc.green('Saved data plot in {}'.format(file_path))
+        if show:
             plt.show()
-        plt.clf()
+        plt.close()
 
     def get_title(self):
         """
@@ -140,8 +149,9 @@ class DataGenerator:
         ax2 = fig.add_subplot(212)
         ax1.title.set_text('Normal time series.')
         ax2.title.set_text('Anomaly time series.')
-        ax1.plot(np.arange(self.nsample), default_series)
-        ax2.plot(np.arange(self.nsample), anomaly_series)
+        ax1.plot(np.arange(self.nsample), default_series, c='blue')
+        ax2.plot(np.arange(self.nsample), anomaly_series, c='red')
         plt.tight_layout() # avoid overlapping plot titles
         fig.savefig('img/raw_data.png')
         plt.show()
+        plt.close()
