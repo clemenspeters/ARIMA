@@ -1,0 +1,45 @@
+[33mGenerating normal timeseries...[0m
+[33mGenerating anomaly timeseries...[0m
+[33mCombining the two timeseries to get one time seriescontaining anomalies...[0m
+[32mSaved data plot in results/generated/generated_data.png[0m
+[32mSaved data in results/generated/generated_data.csv.[0m
+[33mGenerating features...[0m
+[32mSaved features in results/generated/features_ARMA.csv[0m
+[33mVisualize features using TSNE...[0m
+[32mSaved TSNE visualized features using results/generated/features_ARMA_TSNE.png_TSNE-features.png[0m
+[33mVisualize features using UMAP...[0m
+[32mSaved UMAP visualized features using results/generated/features_ARMA_UMAP.png_UMAP-features.png[0m
+[33mDetecting anomalies using Robust covariance...[0m
+Robust covariance
+999 -1 49950.0 - 50050.0
+1000 -1 50000.0 - 50100.0
+1001 -1 50050.0 - 50150.0
+1599 -1 79950.0 - 80050.0
+1600 -1 80000.0 - 80100.0
+1601 -1 80050.0 - 80150.0
+[33mDetecting anomalies using One-Class SVM...[0m
+One-Class SVM
+57 -1 2850.0 - 2950.0
+206 -1 10300.0 - 10400.0
+435 -1 21750.0 - 21850.0
+1000 -1 50000.0 - 50100.0
+1064 -1 53200.0 - 53300.0
+1115 -1 55750.0 - 55850.0
+1769 -1 88450.0 - 88550.0
+[33mDetecting anomalies using Isolation Forest...[0m
+Isolation Forest
+57 -1 2850.0 - 2950.0
+170 -1 8500.0 - 8600.0
+206 -1 10300.0 - 10400.0
+1000 -1 50000.0 - 50100.0
+1115 -1 55750.0 - 55850.0
+1769 -1 88450.0 - 88550.0
+[33mDetecting anomalies using Local Outlier Factor...[0m
+Local Outlier Factor
+999 -1 49950.0 - 50050.0
+1000 -1 50000.0 - 50100.0
+1001 -1 50050.0 - 50150.0
+1219 -1 60950.0 - 61050.0
+1600 -1 80000.0 - 80100.0
+1601 -1 80050.0 - 80150.0
+[32mSaved anomaly plot to results/generated/anomalies.png[0m
