@@ -29,7 +29,7 @@ class DataGenerator:
         self.nsample = window_count * window_size  # number of observations/samples
         self.file_name = file_name
 
-    def generate_timeseries(self, show=True, seed=12345):
+    def generate_timeseries(self, show=False, seed=12345):
         np.random.seed(seed)
         """Stitch together two time series with different  ARMA parameters
         to generate one timeseries which contains anomalies.
@@ -105,9 +105,8 @@ class DataGenerator:
         """Write data to pandas csv file.
         """
         df = pd.DataFrame(data) 
-        file_path = '{}.csv'.format(self.file_name)
-        df.to_csv(file_path, index=False) 
-        tc.green('Saved data in {}.'.format(file_path))
+        df.to_csv(self.file_name, index=False) 
+        tc.green('Saved data in {}.'.format(self.file_name))
 
     def create_data_plot(self, data, show):
         """Plot the generated (stitched) data containing the anomalies.
@@ -119,9 +118,9 @@ class DataGenerator:
         plt.plot(data['value'], color='blue')
         plt.plot(data.mask((data['is_anomaly'] == 0))['value'], color='red')
         plt.tight_layout() # avoid overlapping plot titles
-        file_path = '{}.png'.format(self.file_name)
-        fig.savefig(file_path)
-        tc.green('Saved data plot in {}'.format(file_path))
+        image_file_name = self.file_name.replace('.csv', '.png')
+        fig.savefig(image_file_name)
+        tc.green('Saved data plot in {}'.format(image_file_name))
         if show:
             plt.show()
         plt.close()

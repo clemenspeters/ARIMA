@@ -6,7 +6,7 @@ import anomalyDetector
 import utils
 
 def generate_timeseries(window_size, window_count, anomaly_windows):
-    file_name = 'results/generated/generated_data'
+    file_name = 'results/generated/generated_timeseries.csv'
     generator = dataGenerator.DataGenerator(
         window_count,
         window_size,
@@ -15,7 +15,7 @@ def generate_timeseries(window_size, window_count, anomaly_windows):
     )
 
     timeseries = generator.generate_timeseries(show = False)
-    # timeseries = pd.read_csv('results/generated/generated_data.csv')
+    # timeseries = pd.read_csv(file_name)
     # generator.create_data_plot(data, True)
     # generator.visualize(data)
     return timeseries
@@ -35,10 +35,9 @@ def generate_features(timeseries, window_size):
     )
 
     # data = pd.read_csv(file_name_features)
-    file_name = 'results/generated/features_{}_TSNE.png'.format(encoding_method)
-    processor.visualize_features(data, file_name, method='TSNE')
-    file_name = 'results/generated/features_{}_UMAP.png'.format(encoding_method)
-    processor.visualize_features(data, file_name, method='UMAP')
+    fn = 'results/generated/{}'.format(encoding_method)
+    processor.visualize_features(data, fn, method='TSNE')
+    processor.visualize_features(data, fn, method='UMAP')
     return data
 
 
