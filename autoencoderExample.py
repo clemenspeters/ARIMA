@@ -1,47 +1,99 @@
 from autoencoder import setup
 from autoencoder import encoder
+import dataGenerator
 import dataProcessor
 import pandas as pd
+import terminalColors as tc
 
-file_name_training = 'ws100-wc3000-a[500, 1000, 1500, 2000, 2500, 2800]'
-file_name_test = 'ws100-wc1000-a[500,800]'
-file_name_training_features = '{}--features'.format(file_name_training)
-file_name_test_features = '{}--features'.format(file_name_test)
+folder = 'results/generated/autoencoder'
 
-def generate_data_and_features():
+def generate_training_timeseries():
     # Generate training data (and features) with anomalies
-    setup.generate_data(
+    fn_train = '{}/training_timeseries.csv'.format(folder)
+
+    generator = dataGenerator.DataGenerator(
         window_size = 100,
+        anomalies = [500, 1000, 1500, 2000, 2500, 2800],
         window_count = 3000,
-        anomalies = [500, 1000, 1500, 2000, 2500, 2800], # Feature index = * 2 (because stride = window_size/2)
-        file_name=file_name_training,
-        seed=1111
+        file_name=fn_train,
     )
 
+    # return pd.read_csv(fn_train)
+    return generator.generate_timeseries(show = False, seed=1111)
+
+
+def generate_test_timeseries():
     # Generate test data (and features) with anomalies
-    setup.generate_data(
+    fn_test = '{}/test_timeseries.csv'.format(folder)
+
+    generator = dataGenerator.DataGenerator(
         window_size = 100,
         window_count = 1000,
         anomalies = [500, 800], # Feature index 1000 and 1600 (because stride = window_size/2)
-        file_name=file_name_test,
-        seed=55555
+        file_name=fn_test,
     )
 
+    # return pd.read_csv(fn_test)
+    return generator.generate_timeseries(show = False, seed=55555)
 
-def detect_anomalies():
-    regularization_strengths = [0.0, 0.0001, 0.001, 0.01, 0.1]
+
+def generate_features(timeseries, window_size, name='training'):
+    encoding_method = 'ARMA'
+    fn = '{}/features-{}_{}.csv'.format(folder, name, encoding_method)
+    processor = dataProcessor.DataProcessor()
+
+    data = processor.generate_features(
+        timeseries.value.values,
+        timeseries.is_anomaly.values,
+        window_size,
+        fn,
+        encoding_method
+    )
+
+    # data = pd.read_csv(fn)
+    fn = '{}/{}-{}'.format(folder, name, encoding_method)
+    processor.visualize_features(data, fn, method='TSNE')
+    processor.visualize_features(data, fn, method='UMAP')
+    return data
+
+
+def generate_data_and_features():
+    test_data = generate_features(ts_test, window_size, 'test')
+    window_size = 100
+    ts_train = generate_training_timeseries()
+    ts_test = generate_test_timeseries()
+    train_data = generate_features(ts_train, window_size, 'training')
+    test_data = generate_features(ts_test, window_size, 'test')
+    return train_data, test_data
+
+
+def load_data():
+    train_data = pd.read_csv('{}/features-training_ARMA.csv'.format(folder))
+    test_data = pd.read_csv('{}/features-test_ARMA.csv'.format(folder))
+    return train_data, test_data
+
+
+def detect_anomalies(train_features, test_features, test_anomaly_indices):
+    regularization_strengths = [0.0, 0.00001, 0.0001, 0.001, 0.01, 0.1]
 
     for regularization_strength in regularization_strengths:
-
-        print('Running with regularization_strength: {}'.format(
+        tc.yellow('Running with regularization_strength {}...'.format(
             regularization_strength
         ))
 
-        encoder.run(
-            file_name_training_features,
-            file_name_test_features,
-            regularization_strength
+        result_file_name = '{}/anomaly_scores_regularization_{}.csv'.format(
+            folder,
+            str(regularization_strength).replace('.', '_')
         )
+
+        encoder.run(
+            train_features,
+            test_features,
+            test_anomaly_indices,
+            regularization_strength,
+            result_file_name
+        )
+
 
 def visualize_features(file_name):
     window_size = 100
@@ -51,9 +103,14 @@ def visualize_features(file_name):
     processor.visualize_features(features, file_name, 'TSNE')
     processor.visualize_features(features, file_name, 'UMAP')
 
-generate_data_and_features()
-visualize_features(file_name_training_features)
-detect_anomalies() # Use autoencoder to detect anomalies
+# Generate time series data and ARMA features
+# train_data, test_data = generate_data_and_features()
+train_data, test_data = load_data()
+train_features = train_data.drop(['is_anomaly', 'window_label'], axis=1).values
+test_features = test_data.drop(['is_anomaly', 'window_label'], axis=1).values
+anomaly_indices = test_data.index[test_data.is_anomaly == 1].tolist()
+# Use autoencoder to detect anomalies
+detect_anomalies(train_features, test_features, anomaly_indices) 
 
 
 # result_file_name = 'autoencoder_anomaly_scores_same_train_test_regularization_dense_0_1'
