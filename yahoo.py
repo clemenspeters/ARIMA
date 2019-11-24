@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import dataProcessor
 import anomalyDetector
 import utils
+import terminalColors as tc
 
 
 def load_files(path, file_count):
@@ -23,7 +24,7 @@ def load_files(path, file_count):
     return pd.concat(file_list, axis=0, ignore_index=True)
 
 
-def visualize(data, file_count):
+def visualize(data, file_count, file_name, show=False):
     '''Plot a line graph with red markers for all anomalies.
     '''
     fig = plt.figure()
@@ -38,8 +39,10 @@ def visualize(data, file_count):
         plt.scatter(index, row['value'], marker='x', color='red')
 
     plt.tight_layout()
-    fig.savefig('results/yahoo_data_{}_files.png'.format(file_count))
-    plt.show()
+    fig.savefig(file_name)
+    tc.green('Saved plot in {}'.format(file_name))
+    if show:
+        plt.show()
 
 
 def plot_data_insights(data):
@@ -52,13 +55,14 @@ def plot_data_insights(data):
     print(data.groupby(['is_anomaly']).count())
     print(data.index)
 
-
+folder = 'results/yahoo'
 # Load data
 path = './data/yahoo-data-labeled-time-series-anomalies-v1_0/A1Benchmark'
 file_count = 1 # <= 67
 data = load_files(path, file_count) # Load the combined data from the 67 csv files
-plot_data_insights(data) # Print some insights on the data
-visualize(data, file_count) # Visualize / plot
+# plot_data_insights(data) # Print some insights on the data
+fn = '{}/yahoo_data_{}_files.png'.format(folder, file_count)
+visualize(data, file_count, fn) # Visualize / plot
 
 # Get anomaly labels from data
 window_size = 100
@@ -66,19 +70,31 @@ anomalies = data.index[data['is_anomaly'] == 1].tolist()
 anomaly_windows = utils.anomalies_index_to_window_index(anomalies, window_size)
 
 # Generate features
-features_file_name = 'yahoo-features-{}'.format(file_count)
-processor = dataProcessor.DataProcessor(window_size, anomaly_windows)
-features = processor.reduce_arma(data.value, features_file_name)
-features = pd.read_csv('data/{}.csv'.format(features_file_name)).values
-processor.visualize_features(features, features_file_name)
+encoding_method = 'ARMA'
+fn = '{}/yahoo-features-{}_{}.csv'.format(folder, file_count, encoding_method)
+processor = dataProcessor.DataProcessor()
+features = processor.generate_features(
+    data.value.values, 
+    data.is_anomaly.values,
+    window_size,
+    fn,
+    encoding_method
+)
+# features = pd.read_csv(fn)
+fn = '{}/features_{}_TSNE.png'.format(folder, encoding_method)
+processor.visualize_features(features, fn, method='TSNE')
 
 # Detect anomalies
-outliers_fraction = 2 / 27
+outliers_fraction = features.is_anomaly.mean()
+fn = '{}/anomalies.png'.format(folder)
+
 detector = anomalyDetector.AnomalyDetector(
     outliers_fraction, 
     window_size, 
-    'img/anomalies'
+    fn
 )
+
+features = features.drop(['is_anomaly', 'window_label'], axis=1).values
 detector.detect_anomalies(features)
 
 
