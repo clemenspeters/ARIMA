@@ -1,7 +1,7 @@
 # Anomaly detection on ARIMA manifolds
 
 This repository is a code playground for my master thesis at TU Berlin.  
-The topic of my thesis is _Anomaly detection in ARIMA manifolds_.
+The topic of my thesis is _Anomaly detection on ARIMA manifolds_.
 
 ## Autoencoder
 
@@ -16,6 +16,8 @@ python3 autoencoderExample.py | tee autoencoder/log.txt
 
 ## NYC Taxi Dataset
 
+### Numenta taxi data
+
 ![NYC Taxi Dataset Numenta](./results/taxi_nyc_numenta_data/taxi_data.png)
 
 The dataset is downloaded from [Numenta](https://github.com/numenta/NAB/blob/master/data/realKnownCause/nyc_taxi.csv).  
@@ -26,7 +28,20 @@ For other datasets please also see [The Numenta Anomaly Benchmark](https://githu
 python3 taxi_nyc_numenta_data.py | tee results/taxi_nyc_numenta_data/log_taxi.txt
 ```
 
-Please find results in ./taxi_nyc_numenta_data.
+Please find results in results/taxi_nyc_numenta_data
+
+### Custom taxi data
+
+![NYC Taxi Dataset Custom](./results/taxi_nyc_custom/plot_all_126_taxi_files.png)
+
+The raw data was downloaded from the [NYC Taxi and Limousine Commission](https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page)  
+and processed into 30 minutes time buckets (see **Data processing pipeline**).
+
+```console
+python3 nyc_taxi_custom.py
+```
+
+Please find results in results/taxi_nyc_custom
 
 ### [Data processing pipeline](./aws_lambda_taxi_data/README.md)
 
