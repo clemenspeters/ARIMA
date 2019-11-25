@@ -16,7 +16,10 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation
 
 
-def visualize_and_save(data, file_name, regularization_strength):
+def visualize_and_save(data, labels, file_name, regularization_strength):
+    anomaly_indices = [i for i, x in enumerate(labels) if x == 1]
+    for ai in anomaly_indices:
+        plt.axvline(x=ai, zorder=-1, c='green')
     axes = plt.gca()
     axes.set_ylim([0, 1])
     plt.plot(data) # plotting by columns
@@ -25,10 +28,9 @@ def visualize_and_save(data, file_name, regularization_strength):
     plt.savefig(image_file)
     plt.clf()
     tc.green('Saved image {}'.format(image_file))
-    # plt.show()
 
 
-def run(training_data, test_data, test_anomaly_indices, regularization_strength, file_name):
+def run(training_data, test_data, test_labels, regularization_strength, file_name):
     assert training_data.shape[1] == test_data.shape[1]
 
     # Train autoencoder network
@@ -68,30 +70,31 @@ def run(training_data, test_data, test_anomaly_indices, regularization_strength,
     model.fit(training_data, training_data, verbose=1, epochs=40)
 
     pred = model.predict(training_data)
-    score1 = np.sqrt(metrics.mean_squared_error(pred,training_data))
-    print("Training Normal Score (RMSE): {}".format(score1))
+    score = np.sqrt(metrics.mean_squared_error(pred,training_data))
+    print("Training Normal Score (RMSE): {}".format(score))
 
     pred = model.predict(test_data)
-    score1 = np.sqrt(metrics.mean_squared_error(pred,test_data))
-    print("Test Normal Score (RMSE): {}".format(score1))
+    score = np.sqrt(metrics.mean_squared_error(pred,test_data))
+    print("Test Normal Score (RMSE): {}".format(score))
 
     # Predict / create anomaly scores
-    count = 0
-    predictions = []
+    scores = []
+    tc.yellow('Generating anomaly scores...')
     for feature in tqdm(test_data):
         pred = model.predict(np.array([feature]))
-        score1 = np.sqrt(metrics.mean_squared_error(pred,np.array([feature])))
-        predictions.append(score1)
-        count += 1
+        score = np.sqrt(metrics.mean_squared_error(pred, np.array([feature])))
+        scores.append(score)
     
-    # Save predictions (anomaly scores)
-    df = pd.DataFrame(predictions) 
-    df.to_csv(file_name, header=False, index=False)
+    # Save scores (anomaly scores)
+    df = pd.DataFrame({'anomaly_score': scores, 'is_anomaly': test_labels}) 
+    df.to_csv(file_name, index=False)
     tc.green('Saved file {}'.format(file_name))
 
-    visualize_and_save(predictions, file_name, regularization_strength)
+    visualize_and_save(scores, test_labels, file_name, regularization_strength)
 
 
 def load_and_show(file_name, regularization_strength):
     data = pd.read_csv(file_name)
-    visualize_and_save(data, file_name, regularization_strength)
+    scores = data.anomaly_score.values
+    labels = data.is_anomaly.values
+    visualize_and_save(scores, labels, file_name, regularization_strength)

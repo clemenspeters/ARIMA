@@ -1,4 +1,3 @@
-from autoencoder import setup
 from autoencoder import encoder
 import dataGenerator
 import dataProcessor
@@ -73,8 +72,9 @@ def load_data():
     return train_data, test_data
 
 
-def detect_anomalies(train_features, test_features, test_anomaly_indices):
+def detect_anomalies(train_features, test_features, test_labels):
     regularization_strengths = [0.0, 0.00001, 0.0001, 0.001, 0.01, 0.1]
+    regularization_strengths = [0.0001]
 
     for regularization_strength in regularization_strengths:
         tc.yellow('Running with regularization_strength {}...'.format(
@@ -89,7 +89,7 @@ def detect_anomalies(train_features, test_features, test_anomaly_indices):
         encoder.run(
             train_features,
             test_features,
-            test_anomaly_indices,
+            test_labels,
             regularization_strength,
             result_file_name
         )
@@ -108,10 +108,11 @@ def visualize_features(file_name):
 train_data, test_data = load_data()
 train_features = train_data.drop(['is_anomaly', 'window_label'], axis=1).values
 test_features = test_data.drop(['is_anomaly', 'window_label'], axis=1).values
-anomaly_indices = test_data.index[test_data.is_anomaly == 1].tolist()
+test_labels = test_data.is_anomaly.values
 # Use autoencoder to detect anomalies
-detect_anomalies(train_features, test_features, anomaly_indices) 
+detect_anomalies(train_features, test_features, test_labels) 
 
 
 # result_file_name = 'autoencoder_anomaly_scores_same_train_test_regularization_dense_0_1'
-# encoder.load_and_show(result_file_name, 0.1)
+# fn = 'results/generated/autoencoder/anomaly_scores_regularization_0_0001.csv'
+# encoder.load_and_show(fn, 0.0001)
