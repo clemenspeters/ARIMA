@@ -1,4 +1,4 @@
-date_time_bucket, passenger_count
+date_time_bucket,passenger_count
 2010-08-01_00-00,26376
 2010-08-01_00-30,25442
 2010-08-01_01-00,24333

@@ -74,7 +74,7 @@ class TaxiDataFileProcessor:
         report_file = 'report/report_{}.csv'.format(self.dataset_name)
         print("Creating report...")
         output = StringIO()
-        output.write('date_time_bucket, passenger_count\n')
+        output.write('date_time_bucket,passenger_count\n')
         for key in sorted(report.keys()):
             output.write("{},{}\n".format(key, report[key]))
         contents = output.getvalue()
