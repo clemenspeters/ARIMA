@@ -1,6 +1,8 @@
 brew install python3
 brew install jupyter
 pip install  keras matplotlib nose numpy pandas scipy sklearn statsmodels sympy tensorflow tqdm umap-learn
+pip install pydot
+brew install graphviz
 
 
 
