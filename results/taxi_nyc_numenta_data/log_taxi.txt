@@ -1,0 +1,54 @@
+[32mCreated results/taxi_nyc_numenta_data/taxi_data.png[0m
+[33mGenerating features...[0m
+[32mSaved features in results/taxi_nyc_numenta_data/taxi.csv[0m
+[33mVisualize features using TSNE...[0m
+[32mSaved TSNE visualized features using results/taxi_nyc_numenta_data/taxi.csv_TSNE-features.png[0m
+[33mDetecting anomalies using Robust covariance...[0m
+Robust covariance
+1 -1 50.0 - 150.0
+40 -1 2000.0 - 2100.0
+41 -1 2050.0 - 2150.0
+53 -1 2650.0 - 2750.0
+54 -1 2700.0 - 2800.0
+58 -1 2900.0 - 3000.0
+118 -1 5900.0 - 6000.0
+119 -1 5950.0 - 6050.0
+144 -1 7200.0 - 7300.0
+178 -1 8900.0 - 9000.0
+[33mDetecting anomalies using One-Class SVM...[0m
+One-Class SVM
+10 -1 500.0 - 600.0
+24 -1 1200.0 - 1300.0
+41 -1 2050.0 - 2150.0
+53 -1 2650.0 - 2750.0
+54 -1 2700.0 - 2800.0
+143 -1 7150.0 - 7250.0
+144 -1 7200.0 - 7300.0
+145 -1 7250.0 - 7350.0
+169 -1 8450.0 - 8550.0
+171 -1 8550.0 - 8650.0
+[33mDetecting anomalies using Isolation Forest...[0m
+Isolation Forest
+1 -1 50.0 - 150.0
+10 -1 500.0 - 600.0
+53 -1 2650.0 - 2750.0
+118 -1 5900.0 - 6000.0
+119 -1 5950.0 - 6050.0
+143 -1 7150.0 - 7250.0
+144 -1 7200.0 - 7300.0
+151 -1 7550.0 - 7650.0
+161 -1 8050.0 - 8150.0
+171 -1 8550.0 - 8650.0
+[33mDetecting anomalies using Local Outlier Factor...[0m
+Local Outlier Factor
+0 -1 0.0 - 100.0
+2 -1 100.0 - 200.0
+6 -1 300.0 - 400.0
+18 -1 900.0 - 1000.0
+71 -1 3550.0 - 3650.0
+118 -1 5900.0 - 6000.0
+119 -1 5950.0 - 6050.0
+129 -1 6450.0 - 6550.0
+184 -1 9200.0 - 9300.0
+204 -1 10200.0 - 10300.0
+[32mSaved anomaly plot to results/taxi_nyc_numenta_data/anomalies.png[0m
