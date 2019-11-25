@@ -1,8 +1,7 @@
 # Anomaly detection on ARIMA manifolds
 
-This repository is a code playground for my master thesis at TU Berlin.
-This means there is a lot of experimental code and copy/paste parts,
-rather than a production ready perfect project right now.
+This repository is a code playground for my master thesis at TU Berlin.  
+The topic of my thesis is _Anomaly detection in ARIMA manifolds_.
 
 ## Autoencoder
 
