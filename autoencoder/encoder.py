@@ -14,6 +14,7 @@ plt.style.use('ggplot')
 from tensorflow.keras.regularizers import l1
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation
+from tensorflow.keras.utils import plot_model
 
 
 def visualize_and_save(data, labels, file_name, regularization_strength):
@@ -38,12 +39,13 @@ def run(training_data, test_data, test_labels, regularization_strength, file_nam
     model = Sequential()
     data_dim = test_data.shape[1]
     hidden_dim = int(data_dim / 2)
-    # Input layer
+    # Input layer and first encoding layer
     model.add(Dense(
         hidden_dim,
         input_dim=data_dim,
         activation='relu',
-        activity_regularizer=l1(regularization_strength)
+        activity_regularizer=l1(regularization_strength),
+        name='encoding'
     ))
 
     # Add layers with decreasing size
@@ -51,31 +53,38 @@ def run(training_data, test_data, test_labels, regularization_strength, file_nam
         model.add(Dense(
             hidden_dim,
             activation='relu',
-            activity_regularizer=l1(regularization_strength)
+            activity_regularizer=l1(regularization_strength),
+            name='encoding'
         ))
         hidden_dim = (hidden_dim / 2)
 
     # Add layers with increasing size
-    while hidden_dim < data_dim:
+    hidden_dim = (hidden_dim * 2)
+    while hidden_dim <= data_dim:
         model.add(Dense(
             hidden_dim,
             activation='relu',
-            activity_regularizer=l1(regularization_strength)
+            activity_regularizer=l1(regularization_strength),
+            name='decoding'
         ))
         hidden_dim = (hidden_dim * 2)
 
     # Output layer
-    model.add(Dense(data_dim)) # Multiple output neurons
+    model.add(Dense(data_dim, name='output')) # Multiple output neurons
     model.compile(loss='mean_squared_error', optimizer='adam')
     model.fit(training_data, training_data, verbose=1, epochs=40)
 
+    fn = file_name.replace('.csv', '_model.png')
+    plot_model(model, to_file=fn, show_shapes=True)
+    tc.green('Saved model image as {}'.format(fn))
+
     pred = model.predict(training_data)
-    score = np.sqrt(metrics.mean_squared_error(pred,training_data))
-    print("Training Normal Score (RMSE): {}".format(score))
+    score = np.sqrt(metrics.mean_squared_error(pred, training_data))
+    tc.yellow("Training Normal Score (RMSE): {}".format(score))
 
     pred = model.predict(test_data)
-    score = np.sqrt(metrics.mean_squared_error(pred,test_data))
-    print("Test Normal Score (RMSE): {}".format(score))
+    score = np.sqrt(metrics.mean_squared_error(pred, test_data))
+    tc.yellow("Test Normal Score (RMSE): {}".format(score))
 
     # Predict / create anomaly scores
     scores = []
