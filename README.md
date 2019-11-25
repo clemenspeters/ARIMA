@@ -6,6 +6,8 @@ rather than a production ready perfect project right now.
 
 ## Autoencoder
 
+![Autoencoder](./results/generated/autoencoder/anomaly_scores_regularization_0_0001_model.png)
+
 Example of anomaly detection using generated timeseries data and autoencoder.
 The example show results for different regularization values.
 
@@ -15,12 +17,14 @@ python3 autoencoderExample.py | tee autoencoder/log.txt
 
 ## NYC Taxi Dataset
 
+![NYC Taxi Dataset Numenta](./results/taxi_nyc_numenta_data/taxi_data.png)
+
 The dataset is downloaded from [Numenta](https://github.com/numenta/NAB/blob/master/data/realKnownCause/nyc_taxi.csv).  
 The raw data is from the [NYC Taxi and Limousine Commission](https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page).  
 For other datasets please also see [The Numenta Anomaly Benchmark](https://github.com/numenta/NAB).
 
 ```console
-python3 taxi_nyc_numenta_data.py | tee taxi_nyc_numenta_data/log_taxi.txt
+python3 taxi_nyc_numenta_data.py | tee results/taxi_nyc_numenta_data/log_taxi.txt
 ```
 
 Please find results in ./taxi_nyc_numenta_data.
@@ -38,6 +42,8 @@ python3 yahoo.py | tee log_yahoo.txt
 ```
 
 ## Generated times series
+
+![Generated times series](./results/generated/generated_data_zoomed.png)
 
 Two time series are generate from two ARMA models with different parameters.  
 Then they are combined into one time series which contains anomalies.
