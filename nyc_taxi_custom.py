@@ -25,23 +25,40 @@ def get_sorted_file_names():
 def load_files(file_list, file_count):
     '''Load multiple files from a path in correct order.
     '''
-    data = []
-
     for i, fn in enumerate(file_list):
         filename = '{}/{}'.format(folder, fn)
-        df = pd.read_csv(filename)
-        data.append(df)
+
         if i >= file_count:
             break
 
-    return pd.concat(data, axis=0, ignore_index=True)
+        if i == 0:
+            series = pd.read_csv(
+                filename,
+                header=0,
+                index_col=0,
+                parse_dates=True,
+                squeeze=True
+            )
+            continue
+
+        new_series = pd.read_csv(
+            filename,
+            header=0,
+            index_col=0,
+            parse_dates=True,
+            squeeze=True
+        )
+
+        series = series.append(new_series)
+
+    return series
 
 
 def visualize(data, file_count, file_name, show=False):
     '''Plot a line graph with red markers for all anomalies.
     '''
     fig = plt.figure()
-    data.passenger_count.plot.line(color='blue')
+    data.plot(color='blue')
     title = 'First {} files nyc taxi (custom) dataset'.format(file_count)
     if file_count == 1:
         title = 'First file nyc taxi (custom) dataset'.format(file_count)
@@ -77,8 +94,8 @@ def print_data_insights(data):
 
 file_names = get_sorted_file_names()
 
-# file_count = 10
 file_count = len(file_names) # load all files
+# file_count = 10
 fn = '{}/plot_all_{}_taxi_files.png'.format(img_dir, file_count)
 
 data = load_files(file_names, file_count)
