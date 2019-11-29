@@ -48,7 +48,7 @@ class TaxiDataFileProcessor:
         minute_bucket = '00'
         if minute >= '30':
             minute_bucket = '30'
-        bucket_name = "{}_{}-{}".format(date, hour, minute_bucket)
+        bucket_name = "{} {}:{}".format(date, hour, minute_bucket)
         return bucket_name
 
     def new_bucket_file(self, bucket_name, passenger_count):
