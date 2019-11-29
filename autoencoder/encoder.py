@@ -72,7 +72,7 @@ def run(training_data, test_data, test_labels, regularization_strength, file_nam
     # Output layer
     model.add(Dense(data_dim, name='output')) # Multiple output neurons
     model.compile(loss='mean_squared_error', optimizer='adam')
-    model.fit(training_data, training_data, verbose=1, epochs=40)
+    model.fit(training_data, training_data, verbose=1, epochs=100)
 
     fn = file_name.replace('.csv', '_model.png')
     plot_model(model, to_file=fn, show_shapes=True)

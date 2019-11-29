@@ -13,7 +13,7 @@ from os import walk
 from autoencoder import encoder
 
 folder = 'aws_lambda_taxi_data/output'
-img_dir = 'results/taxi_nyc_custom'
+result_dir = 'results/taxi_nyc_custom'
 window_size = 100
 
 def get_sorted_file_names():
@@ -123,9 +123,8 @@ def visualize_features(file_name, window_size):
     processor.visualize_features(features, file_name, 'UMAP')
 
 
-def detect_anomalies(train_features, test_features, test_labels):
+def detect_anomalies(train_features, test_features, test_labels, out_folder):
     regularization_strengths = [0.0, 0.00001, 0.0001, 0.001, 0.01, 0.1]
-    regularization_strengths = [0.0001]
 
     for regularization_strength in regularization_strengths:
         tc.yellow('Running with regularization_strength {}...'.format(
@@ -133,7 +132,7 @@ def detect_anomalies(train_features, test_features, test_labels):
         ))
 
         result_file_name = '{}/anomaly_scores_regularization_{}.csv'.format(
-            folder,
+            out_folder,
             str(regularization_strength).replace('.', '_')
         )
 
@@ -146,22 +145,38 @@ def detect_anomalies(train_features, test_features, test_labels):
         )
 
 
+def generate_data_and_features(out_folder):
+    file_names = get_sorted_file_names()
+    files_train = file_names[:30]
+    file_count = len(file_names) # load all files
+    fn = '{}/plot_all_{}_taxi_files.png'.format(out_folder, file_count)
+    data_train = load_files(files_train, file_count)
+    visualize(data_train, file_count, fn, show=False)
+    train_data = generate_features(data_train, window_size, out_folder, 'train')
 
-file_names = get_sorted_file_names()
-files_train = file_names[:30]
-file_count = len(file_names) # load all files
-fn = '{}/plot_all_{}_taxi_files.png'.format(img_dir, file_count)
-data_train = load_files(files_train, file_count)
-visualize(data_train, file_count, fn, show=False)
-test_data = generate_features(data_train, window_size, img_dir, 'train')
+
+    file_names = get_sorted_file_names()
+    files_test = file_names[30:]
+    file_count = len(file_names) # load all files
+    fn = '{}/plot_all_{}_taxi_files.png'.format(out_folder, file_count)
+    data_test = load_files(files_test, file_count)
+    visualize(data_test, file_count, fn, show=False)
+    test_data = generate_features(data_test, window_size, out_folder, 'test')
+
+    return train_data, test_data
 
 
-file_names = get_sorted_file_names()
-files_test = file_names[30:]
-file_count = len(file_names) # load all files
-fn = '{}/plot_all_{}_taxi_files.png'.format(img_dir, file_count)
-data_test = load_files(files_test, file_count)
-visualize(data_test, file_count, fn, show=False)
-test_data = generate_features(data_test, window_size, img_dir, 'test')
+def load_data():
+    test_data = pd.read_csv('{}/features-test_ARMA.csv'.format(result_dir))
+    train_data = pd.read_csv('{}/features-train_ARMA.csv'.format(result_dir))
+    return train_data, test_data
 
-# TODO: use autoencoder to detect anomalies
+
+# train_data, test_data = generate_data_and_features(result_dir)
+
+train_data, test_data = load_data()
+train_features = train_data.drop(['is_anomaly', 'window_label'], axis=1).values
+test_features = test_data.drop(['is_anomaly', 'window_label'], axis=1).values
+test_labels = test_data.is_anomaly.values
+# Use autoencoder to detect anomalies
+detect_anomalies(train_features, test_features, test_labels, result_dir) 
