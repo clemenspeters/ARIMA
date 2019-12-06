@@ -127,6 +127,34 @@ def visualize_labelled_features(file_name, show=True):
     processor = dataProcessor.DataProcessor()
     processor.visualize_features(features, file_name, 'TSNE', show)
 
+def visualize_labelled_series(anomaly_windows, show=True):
+    file_names = get_sorted_file_names()
+    files_test = file_names[30:]
+    file_count = len(files_test)
+    fn = '{}/plot_all_{}_taxi_files.png'.format(result_dir, file_count)
+    data_test = load_files(files_test, file_count)
+    # visualize(data_test, file_count, fn, show=True)
+
+    fig = plt.figure()
+    plt.plot(data_test.values, color='blue')
+    title = '{} files nyc taxi (custom) dataset (test data)'.format(file_count)
+    plt.title(title)
+
+    # Highlight anomalies
+    for window in anomaly_windows:
+        start, end  = window.split('-')
+        start = int(start)
+        end = int(end)
+        if len(data_test) < end:
+            end = len(data_test)
+        plt.plot(range(start, end), data_test.values[start:end], color='red')
+
+    plt.tight_layout()
+    # fig.savefig(file_name)
+    # tc.green('Saved plot in {}'.format(file_name))
+    if show:
+        plt.show()
+
 def detect_anomalies(train_features, test_features, test_labels, out_folder):
     regularization_strengths = [0.0, 0.00001, 0.0001, 0.001, 0.01, 0.1]
 
@@ -182,7 +210,7 @@ def label_data(regularization_strength, threshold):
     )
     features_fn = '{}/features-test_ARMA.csv'.format(result_dir)
     encoder.load_and_show(scores_fn, regularization_strength)
-    encoder.load_and_label_data(features_fn, threshold, scores_fn)
+    return encoder.load_and_label_data(features_fn, threshold, scores_fn)
 
 # train_data, test_data = generate_data_and_features(result_dir)
 
@@ -199,3 +227,6 @@ anomaly_windows = label_data(0.001, 0.2)
 # Visualize labelled features
 labelled_features_fn = '{}/features-test_ARMA_labelled_0.2.csv'.format(result_dir)
 visualize_labelled_features(labelled_features_fn)
+
+# Show test time series data
+visualize_labelled_series(anomaly_windows)
