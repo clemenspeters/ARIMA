@@ -122,6 +122,10 @@ def visualize_features(file_name, window_size):
     processor.visualize_features(features, file_name, 'TSNE')
     processor.visualize_features(features, file_name, 'UMAP')
 
+def visualize_labelled_features(file_name, show=True):
+    features = pd.read_csv(file_name)
+    processor = dataProcessor.DataProcessor()
+    processor.visualize_features(features, file_name, 'TSNE', show)
 
 def detect_anomalies(train_features, test_features, test_labels, out_folder):
     regularization_strengths = [0.0, 0.00001, 0.0001, 0.001, 0.01, 0.1]
@@ -189,4 +193,9 @@ test_labels = test_data.is_anomaly.values
 # Use autoencoder to detect anomalies
 detect_anomalies(train_features, test_features, test_labels, result_dir) 
 
+# Set anomaly labels on given threshold of anomaly scores
 anomaly_windows = label_data(0.001, 0.2)
+
+# Visualize labelled features
+labelled_features_fn = '{}/features-test_ARMA_labelled_0.2.csv'.format(result_dir)
+visualize_labelled_features(labelled_features_fn)
