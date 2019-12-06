@@ -17,7 +17,13 @@ from tensorflow.keras.layers import Dense, Activation
 from tensorflow.keras.utils import plot_model
 
 
-def visualize_and_save(data, labels, file_name, regularization_strength):
+def visualize_and_save(
+    data,
+    labels,
+    file_name,
+    regularization_strength,
+    show=False
+):
     anomaly_indices = [i for i, x in enumerate(labels) if x == 1]
     for ai in anomaly_indices:
         plt.axvline(x=ai, zorder=-1, c='green')
@@ -27,8 +33,10 @@ def visualize_and_save(data, labels, file_name, regularization_strength):
     plt.title('regularization_strength: {}'.format(regularization_strength))
     image_file = file_name.replace('.csv', '.png')
     plt.savefig(image_file)
-    plt.clf()
     tc.green('Saved image {}'.format(image_file))
+    if show:
+        plt.show()
+    plt.clf()
 
 
 def run(training_data, test_data, test_labels, regularization_strength, file_name):
@@ -102,8 +110,18 @@ def run(training_data, test_data, test_labels, regularization_strength, file_nam
     visualize_and_save(scores, test_labels, file_name, regularization_strength)
 
 
-def load_and_show(file_name, regularization_strength):
+def load_and_show(file_name, regularization_strength, show=True):
     data = pd.read_csv(file_name)
     scores = data.anomaly_score.values
     labels = data.is_anomaly.values
-    visualize_and_save(scores, labels, file_name, regularization_strength)
+    visualize_and_save(scores, labels, file_name, regularization_strength, show)
+    return data
+
+def load_and_label_data(threshold, file_name):
+    df = pd.read_csv(file_name)
+    df.loc[(df.anomaly_score > threshold), 'is_anomaly'] = 1
+    file_name = file_name.replace('.csv', '_labelled_{}.csv'.format(
+        str(threshold)
+    ))
+    df.to_csv(file_name, index=False)
+    tc.green('Saved file {}'.format(file_name))
