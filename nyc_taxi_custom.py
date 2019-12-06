@@ -172,12 +172,13 @@ def load_data():
     return train_data, test_data
 
 def label_data(regularization_strength, threshold):
-    result_file_name = '{}/anomaly_scores_regularization_{}.csv'.format(
+    scores_fn = '{}/anomaly_scores_regularization_{}.csv'.format(
         result_dir,
         str(regularization_strength).replace('.', '_')
     )
-    encoder.load_and_show(result_file_name, regularization_strength)
-    encoder.load_and_label_data(threshold, result_file_name)
+    features_fn = '{}/features-test_ARMA.csv'.format(result_dir)
+    encoder.load_and_show(scores_fn, regularization_strength)
+    encoder.load_and_label_data(features_fn, threshold, scores_fn)
 
 # train_data, test_data = generate_data_and_features(result_dir)
 
@@ -188,4 +189,4 @@ test_labels = test_data.is_anomaly.values
 # Use autoencoder to detect anomalies
 detect_anomalies(train_features, test_features, test_labels, result_dir) 
 
-label_data(0.001, 0.2)
+anomaly_windows = label_data(0.001, 0.2)

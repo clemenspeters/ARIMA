@@ -117,11 +117,24 @@ def load_and_show(file_name, regularization_strength, show=True):
     visualize_and_save(scores, labels, file_name, regularization_strength, show)
     return data
 
-def load_and_label_data(threshold, file_name):
-    df = pd.read_csv(file_name)
-    df.loc[(df.anomaly_score > threshold), 'is_anomaly'] = 1
-    file_name = file_name.replace('.csv', '_labelled_{}.csv'.format(
+def load_and_label_data(features_fn, threshold, scores_fn):
+    features = pd.read_csv(features_fn)
+    anomaly_data = pd.read_csv(scores_fn)
+    mask = anomaly_data.anomaly_score > threshold
+    # Save labelled anomaly scores
+    anomaly_data.loc[mask, 'is_anomaly'] = 1
+    fn = scores_fn.replace('.csv', '_labelled_{}.csv'.format(
         str(threshold)
     ))
-    df.to_csv(file_name, index=False)
-    tc.green('Saved file {}'.format(file_name))
+    anomaly_data.to_csv(fn, index=False)
+    tc.green('Saved file {}'.format(fn))
+    # Save labelled features
+    features.loc[mask, 'is_anomaly'] = 1
+    fn = features_fn.replace('.csv', '_labelled_{}.csv'.format(
+        str(threshold)
+    ))
+    features.to_csv(fn, index=False)
+    tc.green('Saved file {}'.format(fn))
+    # Return anomaly windows
+    anomaly_windows = features.loc[mask].window_label
+    return anomaly_windows
