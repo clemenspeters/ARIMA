@@ -91,12 +91,13 @@ class DataProcessor:
         normal = plt.scatter(embedded[ni, 0], embedded[ni, 1], c='blue')
         anomaly = plt.scatter(embedded[ai, 0], embedded[ai, 1], c='red')
 
-        for i in ai:
-            wl = data.loc[i].window_label
-            plt.annotate(
-                '{} ({})'.format(i, wl), 
-                (embedded[i, 0], embedded[i, 1])
-            )
+        # Add time window labels to feature plot
+        # for i in ai:
+        #     wl = data.loc[i].window_label
+        #     plt.annotate(
+        #         '{} ({})'.format(i, wl), 
+        #         (embedded[i, 0], embedded[i, 1])
+        #     )
 
         plt.legend((normal, anomaly), ('Normal', 'Anomaly'), loc='lower right')
         plt.title('{} projection of the features\n'.format(method))
