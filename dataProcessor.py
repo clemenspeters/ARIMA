@@ -15,7 +15,16 @@ class DataProcessor:
     is fittet. The parameters of the ARMA model serve as features.
     """
 
-    def generate_features(self, timeseries, anomaly_labels, window_size, file_name, method='ARMA', stride=0):
+    def generate_features(
+        self,
+        timeseries,
+        anomaly_labels,
+        window_size,
+        file_name,
+        method='ARMA',
+        order=(2, 2),
+        stride=0
+    ):
         """Process the complete timeseries. Create windows first and then
         encode each window to reduce the dimensionality.
 
@@ -50,9 +59,12 @@ class DataProcessor:
             window_is_anomaly = min(1, sum(anomaly_labels[start: end]))
             windows.loc[i] = [start, end, window_is_anomaly]
 
-            fitted = get_parameters(window_data)
+            fitted = get_parameters(window_data, order)
             if i == 0:
-                feature_columns = np.append(fitted.data.param_names, ('is_anomaly', 'window_label'))
+                feature_columns = np.append(
+                    fitted.data.param_names,
+                    ('is_anomaly', 'window_label')
+                )
                 features = pd.DataFrame(columns=feature_columns) 
             window_label = '{}-{}'.format(start, end)
             # TODO: add fitted.sigma2
@@ -65,15 +77,16 @@ class DataProcessor:
         return pd.read_csv(file_name)
 
 
-    def get_arma_params(self, window_data):
-        model = sm.tsa.ARMA(window_data, (2, 2))
-        startParams=[.75, -.25, .65, .35] # Manual hack to avoid errors
+    def get_arma_params(self, window_data, order=(2, 2)):
+        model = sm.tsa.ARMA(window_data, order)
+        startParams = np.zeros(sum(order))
         return model.fit(trend='nc', disp=0, start_params=startParams)
 
     # TODO: test arima params
-    def get_arima_params(self, window_data):
-        model = sm.tsa.ARIMA(window_data, (2, 1, 2))
-        return model.fit(trend='nc', disp=0)
+    def get_arima_params(self, window_data, order=(2, 1, 2)):
+        model = sm.tsa.ARIMA(window_data, order)
+        startParams = np.zeros(order[0] + order[2])
+        return model.fit(trend='nc', disp=0, start_params=startParams)
 
     def visualize_features(self, data, file_name, method='TSNE', show=False):
         fig = plt.figure()
