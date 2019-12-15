@@ -10,11 +10,27 @@ import matplotlib.pyplot as plt
 import dataProcessor
 import anomalyDetector
 from os import walk
+import os
+from os import path
 from autoencoder import encoder
+import terminalColors as tc
+
+encoding_method = 'ARIMA'       # CHANGE HERE
+order = (3, 1, 3)               # CHANGE HERE
+# encoding_method = 'ARMA'      # CHANGE HERE
+# order = (2,2)                 # CHANGE HERE
+avoidOverwrite = True           # CHANGE HERE
 
 folder = 'aws_lambda_taxi_data/output'
-result_dir = 'results/taxi_nyc_custom'
+result_dir = 'results/taxi_nyc_custom_{}-{}'.format(encoding_method, '_'.join(str(x) for x in order))
 window_size = 100
+
+if path.exists('./{}'.format(result_dir)):
+    tc.red('RESULT PATH EXISTS ALREADY: {}'.format(result_dir))
+    if avoidOverwrite:
+        quit()
+else:
+    os.mkdir(result_dir)
 
 def get_sorted_file_names():
     result = []
