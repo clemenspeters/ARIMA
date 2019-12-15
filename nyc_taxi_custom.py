@@ -20,6 +20,7 @@ order = (3, 1, 3)               # CHANGE HERE
 # encoding_method = 'ARMA'      # CHANGE HERE
 # order = (2,2)                 # CHANGE HERE
 avoidOverwrite = True           # CHANGE HERE
+loadFeatures = False            # CHANGE HERE
 
 folder = 'aws_lambda_taxi_data/output'
 result_dir = 'results/taxi_nyc_custom_{}-{}'.format(encoding_method, '_'.join(str(x) for x in order))
@@ -111,7 +112,6 @@ def print_data_insights(data):
 
 
 def generate_features(timeseries, window_size, out_folder, name='training'):
-    encoding_method = 'ARMA'
     fn = '{}/features-{}_{}.csv'.format(out_folder, name, encoding_method)
     processor = dataProcessor.DataProcessor()
 
@@ -121,7 +121,8 @@ def generate_features(timeseries, window_size, out_folder, name='training'):
         np.zeros(len(timeseries.values), dtype=int),
         window_size,
         fn,
-        encoding_method
+        encoding_method,
+        order
     )
 
     # data = pd.read_csv(fn)
@@ -147,7 +148,7 @@ def visualize_labelled_series(anomaly_windows, show=True):
     file_names = get_sorted_file_names()
     files_test = file_names[30:]
     file_count = len(files_test)
-    fn = '{}/plot_all_{}_taxi_files.png'.format(result_dir, file_count)
+    fn = '{}/plot_test_taxi_files_anomalies.png'.format(result_dir)
     data_test = load_files(files_test, file_count)
     # visualize(data_test, file_count, fn, show=True)
 
@@ -166,22 +167,24 @@ def visualize_labelled_series(anomaly_windows, show=True):
         plt.plot(range(start, end), data_test.values[start:end], color='red')
 
     plt.tight_layout()
-    # fig.savefig(file_name)
-    # tc.green('Saved plot in {}'.format(file_name))
+    fig.savefig(fn)
+    tc.green('Saved plot in {}'.format(fn))
     if show:
         plt.show()
 
 def detect_anomalies(train_features, test_features, test_labels, out_folder):
     regularization_strengths = [0.0, 0.00001, 0.0001, 0.001, 0.01, 0.1]
+    epochs = 100
 
     for regularization_strength in regularization_strengths:
         tc.yellow('Running with regularization_strength {}...'.format(
             regularization_strength
         ))
 
-        result_file_name = '{}/anomaly_scores_regularization_{}.csv'.format(
+        fn = '{}/anomaly_scores_regularization_{}_epochs_{}.csv'.format(
             out_folder,
-            str(regularization_strength).replace('.', '_')
+            str(regularization_strength).replace('.', '_'),
+            epochs
         )
 
         encoder.run(
@@ -189,7 +192,8 @@ def detect_anomalies(train_features, test_features, test_labels, out_folder):
             test_features,
             test_labels,
             regularization_strength,
-            result_file_name
+            fn,
+            epochs
         )
 
 
@@ -215,22 +219,26 @@ def generate_data_and_features(out_folder):
 
 
 def load_data():
-    test_data = pd.read_csv('{}/features-test_ARMA.csv'.format(result_dir))
-    train_data = pd.read_csv('{}/features-train_ARMA.csv'.format(result_dir))
+    test_data = pd.read_csv('{}/features-test_{}.csv'.format(
+        result_dir, 
+        encoding_method
+    ))
+    train_data = pd.read_csv('{}/features-train_{}.csv'.format(
+        result_dir, 
+        encoding_method
+    ))
     return train_data, test_data
 
-def label_data(regularization_strength, threshold):
-    scores_fn = '{}/anomaly_scores_regularization_{}.csv'.format(
-        result_dir,
-        str(regularization_strength).replace('.', '_')
-    )
-    features_fn = '{}/features-test_ARMA.csv'.format(result_dir)
+def label_data(scores_fn, features_fn, regularization_strength, threshold):
     encoder.load_and_show(scores_fn, regularization_strength)
     return encoder.load_and_label_data(features_fn, threshold, scores_fn)
 
-# train_data, test_data = generate_data_and_features(result_dir)
 
-train_data, test_data = load_data()
+if loadFeatures:
+    train_data, test_data = load_data()
+else:
+    train_data, test_data = generate_data_and_features(result_dir)
+
 train_features = train_data.drop(['is_anomaly', 'window_label'], axis=1).values
 test_features = test_data.drop(['is_anomaly', 'window_label'], axis=1).values
 test_labels = test_data.is_anomaly.values
@@ -238,10 +246,18 @@ test_labels = test_data.is_anomaly.values
 detect_anomalies(train_features, test_features, test_labels, result_dir) 
 
 # Set anomaly labels on given threshold of anomaly scores
-anomaly_windows = label_data(0.001, 0.2)
+scores_fn = '{}/anomaly_scores_regularization_0_0001_epochs_100.csv'.format(result_dir)      # CHANGE HERE
+threshold = 0.3                                                                              # CHANGE HERE
+regularization_strength = 0.0001                                                             # CHANGE HERE
+features_fn = '{}/features-test_{}.csv'.format(result_dir, encoding_method)
+anomaly_windows = label_data(scores_fn, features_fn, regularization_strength, threshold)
 
 # Visualize labelled features
-labelled_features_fn = '{}/features-test_ARMA_labelled_0.2.csv'.format(result_dir)
+labelled_features_fn = '{}/features-test_{}_labelled_{}.csv'.format(
+    result_dir,
+    encoding_method,
+    threshold
+)
 visualize_labelled_features(labelled_features_fn)
 
 # Show test time series data
