@@ -45,7 +45,10 @@ BEIGEBG2  = '\33[106m'
 WHITEBG2  = '\33[107m'
 
 def green(string_to_print):
-    print(GREEN + string_to_print + END);
+    print(GREEN + string_to_print + END)
+
+def red(string_to_print):
+    print(RED + string_to_print + END)
 
 def yellow(string_to_print):
-    print(YELLOW + string_to_print + END);
+    print(YELLOW + string_to_print + END)
