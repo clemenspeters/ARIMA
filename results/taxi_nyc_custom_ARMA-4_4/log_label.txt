@@ -1,0 +1,6 @@
+[32mSaved image results/taxi_nyc_custom_ARMA-4_4/anomaly_scores_regularization_0_001_epochs_100.png[0m
+[32mSaved file results/taxi_nyc_custom_ARMA-4_4/anomaly_scores_regularization_0_001_epochs_100_labelled_0.7.csv[0m
+[32mSaved file results/taxi_nyc_custom_ARMA-4_4/features-test_ARMA_labelled_0.7.csv[0m
+[33mVisualize features using TSNE...[0m
+[32mSaved TSNE visualized features using results/taxi_nyc_custom_ARMA-4_4/features-test_ARMA_labelled_0.7.csv_TSNE-features.png[0m
+[32mSaved plot in results/taxi_nyc_custom_ARMA-4_4/plot_test_taxi_files_anomalies.png[0m

@@ -1,0 +1,3 @@
+[31mRESULT PATH EXISTS ALREADY: results/taxi_nyc_custom_ARIMA-10_1_10[0m
+[32mSaved plot in results/taxi_nyc_custom_ARIMA-10_1_10/plot_all_126_taxi_files.png[0m
+[33mGenerating features...[0m

@@ -1,0 +1,9 @@
+[32mSaved plot in results/taxi_nyc_custom_ARMA-5_5/plot_all_126_taxi_files.png[0m
+[33mGenerating features...[0m
+[32mSaved features in results/taxi_nyc_custom_ARMA-5_5/features-train_ARMA.csv[0m
+[33mVisualize features using TSNE...[0m
+[32mSaved TSNE visualized features using results/taxi_nyc_custom_ARMA-5_5/train-ARMA_TSNE-features.png[0m
+[33mVisualize features using UMAP...[0m
+[32mSaved UMAP visualized features using results/taxi_nyc_custom_ARMA-5_5/train-ARMA_UMAP-features.png[0m
+[32mSaved plot in results/taxi_nyc_custom_ARMA-5_5/plot_all_126_taxi_files.png[0m
+[33mGenerating features...[0m
