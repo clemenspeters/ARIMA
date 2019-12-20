@@ -222,6 +222,12 @@ def label_data(scores_fn, features_fn, regularization_strength, threshold):
     encoder.load_and_show(scores_fn, regularization_strength)
     return encoder.load_and_label_data(features_fn, threshold, scores_fn)
 
+def show_labelled_data(labelled_features_fn):
+    labelled_features = pd.read_csv(labelled_features_fn)
+    mask = labelled_features.is_anomaly > 0
+    anomaly_windows = anomaly_windows = labelled_features.loc[mask].window_label
+    visualize_labelled_series(anomaly_windows)
+
 
 if loadFeatures:
     train_data, test_data = load_data()
@@ -241,13 +247,9 @@ regularization_strength = 0.0001                                                
 features_fn = '{}/features-test_{}.csv'.format(result_dir, encoding_method)
 anomaly_windows = label_data(scores_fn, features_fn, regularization_strength, threshold)
 
-# Visualize labelled features
-labelled_features_fn = '{}/features-test_{}_labelled_{}.csv'.format(
-    result_dir,
-    encoding_method,
-    threshold
-)
-visualize_labelled_features(labelled_features_fn)
+# Use already labelled feature file to show anomalies in time series data
+# labelled_features_fn = 'results/taxi_nyc_custom_ARMA-2_2/features-test_ARMA_labelled_0.3.csv'
+# show_labelled_data(labelled_features_fn)
 
 # Show test time series data
 visualize_labelled_series(anomaly_windows)
