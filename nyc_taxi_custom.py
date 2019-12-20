@@ -262,7 +262,7 @@ anomaly_windows = label_data(scores_fn, features_fn, regularization_strength, th
 labelled_features_fn = '{}/features-test_{}_labelled_{}.csv'.format(
     result_dir,
     encoding_method,
-    threshold
+    str(threshold).replace('.', '_')
 )
 visualize_labelled_features(labelled_features_fn)
 

@@ -139,14 +139,14 @@ def load_and_label_data(features_fn, threshold, scores_fn):
     # Save labelled anomaly scores
     anomaly_data.loc[mask, 'is_anomaly'] = 1
     fn = scores_fn.replace('.csv', '_labelled_{}.csv'.format(
-        str(threshold)
+        str(threshold).replace('.', '_')
     ))
     anomaly_data.to_csv(fn, index=False)
     tc.green('Saved file {}'.format(fn))
     # Save labelled features
     features.loc[mask, 'is_anomaly'] = 1
     fn = features_fn.replace('.csv', '_labelled_{}.csv'.format(
-        str(threshold)
+        str(threshold).replace('.', '_')
     ))
     features.to_csv(fn, index=False)
     tc.green('Saved file {}'.format(fn))
