@@ -16,11 +16,11 @@ from os import path
 from autoencoder import encoder
 import terminalColors as tc
 
-encoding_method = 'ARIMA'       # CHANGE HERE
-order = (3, 1, 3)               # CHANGE HERE
-# encoding_method = 'ARMA'      # CHANGE HERE
-# order = (2,2)                 # CHANGE HERE
-avoidOverwrite = True           # CHANGE HERE
+# encoding_method = 'ARIMA'       # CHANGE HERE
+# order = (3, 1, 3)               # CHANGE HERE
+encoding_method = 'ARMA'      # CHANGE HERE
+order = (2,2)                 # CHANGE HERE
+avoidOverwrite = False           # CHANGE HERE
 loadFeatures = False            # CHANGE HERE
 
 folder = 'aws_lambda_taxi_data/output'
@@ -244,15 +244,19 @@ test_labels = test_data.is_anomaly.values
 detect_anomalies(train_features, test_features, test_labels, result_dir) 
 
 # Set anomaly labels on given threshold of anomaly scores
-scores_fn = '{}/anomaly_scores_regularization_0_0001_epochs_100.csv'.format(result_dir)      # CHANGE HERE
+scores_fn = '{}/anomaly_scores_regularization_0_01_epochs_100.csv'.format(result_dir)      # CHANGE HERE
 threshold = 0.3                                                                              # CHANGE HERE
-regularization_strength = 0.0001                                                             # CHANGE HERE
+regularization_strength = 0.01                                                             # CHANGE HERE
 features_fn = '{}/features-test_{}.csv'.format(result_dir, encoding_method)
 anomaly_windows = label_data(scores_fn, features_fn, regularization_strength, threshold)
 
-# Use already labelled feature file to show anomalies in time series data
-# labelled_features_fn = 'results/taxi_nyc_custom_ARMA-2_2/features-test_ARMA_labelled_0.3.csv'
-# show_labelled_data(labelled_features_fn)
+# Visualize labelled features
+labelled_features_fn = '{}/features-test_{}_labelled_{}.csv'.format(
+    result_dir,
+    encoding_method,
+    threshold
+)
+visualize_labelled_features(labelled_features_fn)
 
 # Show test time series data
 visualize_labelled_series(anomaly_windows)
