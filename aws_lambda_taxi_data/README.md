@@ -13,6 +13,9 @@ VendorID,lpep_pickup_datetime,Lpep_dropoff_datetime,Store_and_fwd_flag,RateCodeI
 1,2015-01-01 00:34:44,2015-01-01 00:38:15,N,1,-73.843009948730469,40.71905517578125,-73.846580505371094,40.711566925048828,1,.90,5,0.5,0.5,1.8,0,,0,7.8,1,1,,
 ```
 
+**WARNING:** There are some faulty records in the data.
+You can find the fixes in commit [f59bf2e](https://github.com/clemenspeters/ARIMA/commit/f59bf2e5a3d62290c7ba326567ecdcfd62722de7) and [1bdb690](https://github.com/clemenspeters/ARIMA/commit/1bdb690d61023cad4c2e77cf0537ee68da0ac6d7).
+
 I found this dataset thanks to Numenta who processed it to group the  
 passenger count by 30 minutes buckets in their [repo](https://github.com/numenta/NAB/blob/master/data/realKnownCause/nyc_taxi.csv), so that it looks like this:
 
