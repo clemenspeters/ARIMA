@@ -24,9 +24,11 @@ def visualize_and_save(
     regularization_strength,
     show=False
 ):
-    anomaly_indices = [i for i, x in enumerate(labels) if x == 1]
-    for ai in anomaly_indices:
-        plt.axvline(x=ai, zorder=-1, c='green')
+    # Show green vertical lines for each anomaly label
+    # anomaly_indices = [i for i, x in enumerate(labels) if x == 1]
+    # for ai in anomaly_indices:
+    #     plt.axvline(x=ai, zorder=-1, c='green')
+    
     axes = plt.gca()
     axes.set_ylim([0, 1])
     plt.plot(data) # plotting by columns
