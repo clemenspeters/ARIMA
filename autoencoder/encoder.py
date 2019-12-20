@@ -11,6 +11,7 @@ import terminalColors as tc
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
+import os
 from tensorflow.keras.regularizers import l1
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation
@@ -84,7 +85,9 @@ def run(training_data, test_data, test_labels, regularization_strength, file_nam
     model.compile(loss='mean_squared_error', optimizer='adam')
     model.fit(training_data, training_data, verbose=1, epochs=100)
 
-    fn = file_name.replace('.csv', '_model.png')
+    # Save network structure to png
+    dirname = os.path.dirname(file_name)
+    fn = '{}/auto_encoder_model.png'.format(dirname)
     plot_model(model, to_file=fn, show_shapes=True)
     tc.green('Saved model image as {}'.format(fn))
 
