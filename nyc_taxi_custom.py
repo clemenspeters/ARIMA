@@ -245,7 +245,7 @@ detect_anomalies(train_features, test_features, test_labels, result_dir)
 
 # Set anomaly labels on given threshold of anomaly scores
 scores_fn = '{}/anomaly_scores_regularization_0_01_epochs_100.csv'.format(result_dir)      # CHANGE HERE
-threshold = 0.3                                                                              # CHANGE HERE
+threshold = 0.25                                                                           # CHANGE HERE
 regularization_strength = 0.01                                                             # CHANGE HERE
 features_fn = '{}/features-test_{}.csv'.format(result_dir, encoding_method)
 anomaly_windows = label_data(scores_fn, features_fn, regularization_strength, threshold)
