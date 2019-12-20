@@ -231,6 +231,14 @@ def show_labelled_data(labelled_features_fn):
     anomaly_windows = anomaly_windows = labelled_features.loc[mask].window_label
     visualize_labelled_series(anomaly_windows)
 
+def show_raw_data():
+    file_names = get_sorted_file_names()
+    selected_files = file_names[:30]
+    file_count = len(selected_files)
+    fn = '{}/plot_all_{}_taxi_files.png'.format('test', file_count)
+    data_train = load_files(selected_files, file_count)
+    visualize(data_train, file_count, fn, show=True)
+
 
 if loadFeatures:
     train_data, test_data = load_data()
