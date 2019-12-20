@@ -131,14 +131,6 @@ def generate_features(timeseries, window_size, out_folder, name='training'):
     processor.visualize_features(data, fn, method='UMAP')
     return data
 
-
-def visualize_features(file_name, window_size):
-    anomalies = []
-    processor = dataProcessor.DataProcessor(window_size, anomalies)
-    features = pd.read_csv('data/{}.csv'.format(file_name)).values
-    processor.visualize_features(features, file_name, 'TSNE')
-    processor.visualize_features(features, file_name, 'UMAP')
-
 def visualize_labelled_features(file_name, show=True):
     features = pd.read_csv(file_name)
     processor = dataProcessor.DataProcessor()
