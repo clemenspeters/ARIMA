@@ -42,13 +42,21 @@ def visualize_and_save(
     plt.clf()
 
 
-def run(training_data, test_data, test_labels, regularization_strength, file_name):
+def run(
+    training_data,
+    test_data,
+    test_labels,
+    regularization_strength,
+    file_name,
+    epochs=100
+):
     assert training_data.shape[1] == test_data.shape[1]
 
     # Train autoencoder network
     encoding_dim = 2
     model = Sequential()
     data_dim = test_data.shape[1]
+    layers = [data_dim]
     hidden_dim = int(data_dim / 2)
     # Input layer and first encoding layer
     model.add(Dense(
@@ -56,34 +64,36 @@ def run(training_data, test_data, test_labels, regularization_strength, file_nam
         input_dim=data_dim,
         activation='relu',
         activity_regularizer=l1(regularization_strength),
-        name='encoding'
+        name='encoding_{}'.format(hidden_dim)
     ))
+    layers.append(hidden_dim)
 
     # Add layers with decreasing size
-    while encoding_dim < hidden_dim:
+    hidden_dim = int(hidden_dim / 2)
+    while encoding_dim <= hidden_dim:
         model.add(Dense(
             hidden_dim,
             activation='relu',
             activity_regularizer=l1(regularization_strength),
-            name='encoding'
+            name='encoding_{}'.format(hidden_dim)
         ))
-        hidden_dim = (hidden_dim / 2)
-
+        layers.append(hidden_dim)
+        hidden_dim = int(hidden_dim / 2)
+    
     # Add layers with increasing size
-    hidden_dim = (hidden_dim * 2)
-    while hidden_dim <= data_dim:
+    layers.pop() # remove smallest element
+    for hidden_dim in sorted(layers):
         model.add(Dense(
             hidden_dim,
             activation='relu',
             activity_regularizer=l1(regularization_strength),
-            name='decoding'
+            name='decoding_{}'.format(hidden_dim)
         ))
-        hidden_dim = (hidden_dim * 2)
 
     # Output layer
     model.add(Dense(data_dim, name='output')) # Multiple output neurons
     model.compile(loss='mean_squared_error', optimizer='adam')
-    model.fit(training_data, training_data, verbose=1, epochs=100)
+    model.fit(training_data, training_data, verbose=1, epochs=epochs)
 
     # Save network structure to png
     dirname = os.path.dirname(file_name)
