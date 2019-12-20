@@ -78,11 +78,7 @@ def visualize(data, file_count, file_name, show=False):
     '''
     fig = plt.figure()
     data.plot(color='blue')
-    title = 'First {} files nyc taxi (custom) dataset'.format(file_count)
-    if file_count == 1:
-        title = 'First file nyc taxi (custom) dataset'.format(file_count)
-    elif file_count == 126:
-        title = title.replace('First', 'All')
+    title = '{} files of nyc taxi (custom) dataset'.format(file_count)
     plt.title(title)
 
     '''
@@ -193,8 +189,8 @@ def detect_anomalies(train_features, test_features, test_labels, out_folder):
 def generate_data_and_features(out_folder):
     file_names = get_sorted_file_names()
     files_train = file_names[:30]
-    file_count = len(file_names) # load all files
-    fn = '{}/plot_all_{}_taxi_files.png'.format(out_folder, file_count)
+    file_count = len(files_train)
+    fn = '{}/plot_{}_taxi_files.png'.format(out_folder, file_count)
     data_train = load_files(files_train, file_count)
     visualize(data_train, file_count, fn, show=False)
     train_data = generate_features(data_train, window_size, out_folder, 'train')
@@ -202,8 +198,8 @@ def generate_data_and_features(out_folder):
 
     file_names = get_sorted_file_names()
     files_test = file_names[30:]
-    file_count = len(file_names) # load all files
-    fn = '{}/plot_all_{}_taxi_files.png'.format(out_folder, file_count)
+    file_count = len(files_test)
+    fn = '{}/plot_{}_taxi_files.png'.format(out_folder, file_count)
     data_test = load_files(files_test, file_count)
     visualize(data_test, file_count, fn, show=False)
     test_data = generate_features(data_test, window_size, out_folder, 'test')
