@@ -115,6 +115,7 @@ class DataProcessor:
         plt.legend((normal, anomaly), ('Normal', 'Anomaly'), loc='lower right')
         plt.title('{} projection of the features\n'.format(method))
         fig.tight_layout()
+        file_name = file_name.replace('.csv', '')
         file_path = '{}_{}-features.png'.format(file_name, method)
         fig.savefig(file_path)
         if show:
