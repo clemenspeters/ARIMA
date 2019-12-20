@@ -135,6 +135,7 @@ def visualize_labelled_features(file_name, show=True):
     features = pd.read_csv(file_name)
     processor = dataProcessor.DataProcessor()
     processor.visualize_features(features, file_name, 'TSNE', show)
+    processor.visualize_features(features, file_name, 'UMAP', show)
 
 def visualize_labelled_series(anomaly_windows, show=True):
     file_names = get_sorted_file_names()
