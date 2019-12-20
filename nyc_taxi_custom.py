@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import terminalColors as tc
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import dataProcessor
 import anomalyDetector
 from os import walk
@@ -141,8 +142,8 @@ def visualize_labelled_series(anomaly_windows, show=True):
     data_test = load_files(files_test, file_count)
     # visualize(data_test, file_count, fn, show=True)
 
-    fig = plt.figure()
-    plt.plot(data_test.values, color='blue')
+    fig, ax = plt.subplots()
+    plt.plot(data_test.index, data_test.values, color='blue')
     title = '{} files nyc taxi (custom) dataset (test data)'.format(file_count)
     plt.title(title)
 
@@ -153,8 +154,10 @@ def visualize_labelled_series(anomaly_windows, show=True):
         end = int(end)
         if len(data_test) < end:
             end = len(data_test)
-        plt.plot(range(start, end), data_test.values[start:end], color='red')
+        plt.plot(data_test.index[start:end], data_test.values[start:end], color='red')
 
+    ax.get_xaxis().set_minor_locator(mpl.ticker.AutoMinorLocator())
+    plt.setp(ax.get_xticklabels(), rotation=30, horizontalalignment='right')
     plt.tight_layout()
     fig.savefig(fn)
     tc.green('Saved plot in {}'.format(fn))
