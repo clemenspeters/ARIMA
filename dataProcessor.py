@@ -101,8 +101,8 @@ class DataProcessor:
         ai = data.index[data.is_anomaly == 1].tolist()
         ni = data.index[data.is_anomaly == 0].tolist()
 
-        normal = plt.scatter(embedded[ni, 0], embedded[ni, 1], c='blue')
-        anomaly = plt.scatter(embedded[ai, 0], embedded[ai, 1], c='red')
+        normal = plt.scatter(embedded[ni, 0], embedded[ni, 1], c='blue', s=2)
+        anomaly = plt.scatter(embedded[ai, 0], embedded[ai, 1], c='red', s=2)
 
         # Add time window labels to feature plot
         # for i in ai:
