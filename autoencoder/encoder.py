@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 import os
 from tensorflow.keras.regularizers import l1
+from tensorflow.keras.regularizers import l2
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation
 from tensorflow.keras.utils import plot_model
@@ -63,7 +64,7 @@ def run(
         hidden_dim,
         input_dim=data_dim,
         activation='relu',
-        activity_regularizer=l1(regularization_strength),
+        activity_regularizer=l2(regularization_strength),
         name='encoding_{}'.format(hidden_dim)
     ))
     layers.append(hidden_dim)
@@ -74,7 +75,7 @@ def run(
         model.add(Dense(
             hidden_dim,
             activation='relu',
-            activity_regularizer=l1(regularization_strength),
+            activity_regularizer=l2(regularization_strength),
             name='encoding_{}'.format(hidden_dim)
         ))
         layers.append(hidden_dim)
@@ -86,7 +87,7 @@ def run(
         model.add(Dense(
             hidden_dim,
             activation='relu',
-            activity_regularizer=l1(regularization_strength),
+            activity_regularizer=l2(regularization_strength),
             name='decoding_{}'.format(hidden_dim)
         ))
 
