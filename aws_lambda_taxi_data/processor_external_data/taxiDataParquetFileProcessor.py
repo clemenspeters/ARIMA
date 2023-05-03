@@ -23,8 +23,6 @@ if file_path_or_url.startswith('http'):
 
 else:
     file_path = file_path_or_url
-    # pickup_key = 'Trip_Pickup_DateTime'
-    # passenger_count_key = 'Passenger_Count'
     print('Read parquet file from local path {}'.format(file_path))
     df = pd.read_parquet(file_path, engine='pyarrow')
 
