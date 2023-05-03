@@ -17,6 +17,9 @@ data/Numenta/**
 !data/Numenta/realKnownCause/nyc_taxi.csv
 !data/Numenta/labels/raw/known_labels_v1.0.json
 
+# parquet files
+*.parquet
+
 # Yahoo data (not allowed to redistribute)
 data/yahoo-data-labeled-time-series-anomalies-v1_0/**
 !data/yahoo-data-labeled-time-series-anomalies-v1_0/README.txt
